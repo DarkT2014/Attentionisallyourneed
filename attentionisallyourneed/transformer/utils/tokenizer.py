@@ -604,6 +604,7 @@ def _generate_subtokens(
   # the dictionary with subtokens w/ high enough counts.
   for i in xrange(num_iterations):
     tf.logging.info("\tGenerating subtokens: iteration %d" % i)
+    print("\tGenerating subtokens: iteration %d" % i)
     # Generate new subtoken->id dictionary using the new subtoken list.
     subtoken_dict = _list_to_index_dict(subtoken_list)
 
@@ -617,4 +618,5 @@ def _generate_subtokens(
         subtoken_counts, min_count, alphabet, reserved_tokens)
 
     tf.logging.info("\tVocab size: %d" % len(subtoken_list))
+    print("\tVocab size: %d" % len(subtoken_list))
   return subtoken_list
