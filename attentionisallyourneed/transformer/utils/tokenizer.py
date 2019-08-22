@@ -108,7 +108,7 @@ class Subtokenizer(object):
 
     if tf.gfile.Exists(vocab_file):
       # tf.logging.info("Vocab file already exists (%s)" % vocab_file)
-      print(Vocab file already exists (%s)" % vocab_file)
+      print("Vocab file already exists (%s)" % vocab_file)
 
     else:
       # tf.logging.info("Begin steps to create subtoken vocabulary...")
