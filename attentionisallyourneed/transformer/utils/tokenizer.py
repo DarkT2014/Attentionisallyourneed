@@ -107,15 +107,23 @@ class Subtokenizer(object):
       reserved_tokens = RESERVED_TOKENS
 
     if tf.gfile.Exists(vocab_file):
-      tf.logging.info("Vocab file already exists (%s)" % vocab_file)
+      # tf.logging.info("Vocab file already exists (%s)" % vocab_file)
+      print(Vocab file already exists (%s)" % vocab_file)
+
     else:
-      tf.logging.info("Begin steps to create subtoken vocabulary...")
+      # tf.logging.info("Begin steps to create subtoken vocabulary...")
+      print("Begin steps to create subtoken vocabulary...")
       token_counts = _count_tokens(files, file_byte_limit)
+      print("count token done.")
       alphabet = _generate_alphabet_dict(token_counts)
+      print("Genrate alpha dict done.")
+      print("Begin to generate subtokens with target vocab size ...")
       subtoken_list = _generate_subtokens_with_target_vocab_size(
           token_counts, alphabet, target_vocab_size, threshold, min_count,
           reserved_tokens)
-      tf.logging.info("Generated vocabulary with %d subtokens." %
+      # tf.logging.info("Generated vocabulary with %d subtokens." %
+                      # len(subtoken_list))
+      print("Generated vocabulary with %d subtokens." %
                       len(subtoken_list))
       _save_vocab_file(vocab_file, subtoken_list)
       print("save file done.")
