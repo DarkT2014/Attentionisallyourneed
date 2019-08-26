@@ -115,6 +115,7 @@ class Subtokenizer(object):
       print("Begin steps to create subtoken vocabulary...")
       token_counts = _count_tokens(files, file_byte_limit)
       print("count token done.")
+      print("Generating alphabet dict ...")
       alphabet = _generate_alphabet_dict(token_counts)
       print("Genrate alpha dict done.")
       print("Begin to generate subtokens with target vocab size ...")

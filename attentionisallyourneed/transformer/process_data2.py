@@ -133,11 +133,11 @@ if __name__ == '__main__':
     
     
     print("Tokenizinig zh vocab ...")
-    targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
-        zh_vocab, [zh_source_file],  2**15, 20,
-        min_count=None, file_byte_limit=1e9)
-    # print("Saving zh vocab files ...")
-    # _save_vocab_file(zh_vocab, zh_subtoken_list)
+    # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
+    #     zh_vocab, [zh_source_file],  2**15, 20,
+    #     min_count=None, file_byte_limit=1e9)
+    print("Saving zh vocab files ...")
+    _save_vocab_file(zh_vocab, zh_subtoken_list)
     # print("tokenizing zh vocab..")
     # targets_tokenizer = tokenizer.Subtokenizer(zh_vocab, zh_subtoken_list)
 

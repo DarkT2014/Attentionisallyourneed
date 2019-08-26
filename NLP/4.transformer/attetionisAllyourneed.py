@@ -60,6 +60,7 @@ for i, line in iterator_file(zh_source_file):
     outputs.extend(jieba.lcut(line))
 print("zh subword done.")
 
+print(outputs[:15])
 
 
 
@@ -87,6 +88,7 @@ decoder_vocab = get_vocab(outputs, init=TARGET_CODES)
 print(encoder_vocab[:10])
 print(decoder_vocab[:10])
 
+print("resize encode inputs ...")
 encoder_inputs = [[encoder_vocab.index(word) for word in line] for line in inputs]
 decoder_inputs = [[decoder_vocab.index('<GO>')] + [decoder_vocab.index(word) for word in line] for line in outputs]
 decoder_targets = [[decoder_vocab.index(word) for word in line] + [decoder_vocab.index('<EOS>')] for line in outputs]
@@ -106,7 +108,7 @@ def get_batch(encoder_inputs, decoder_inputs, decoder_targets, batch_size=4):
         de_target_batch = np.array([line + [0] * (max_de_len-len(line)) for line in de_target_batch])
         yield en_input_batch, de_input_batch, de_target_batch
 
-
+print("Begin to get batch ...")
 batch = get_batch(encoder_inputs, decoder_inputs, decoder_targets, batch_size=4)
 next(batch)
 
@@ -517,7 +519,7 @@ arg.label_vocab_size = len(decoder_vocab)
 
 
 
-
+print("Ready to train model.")
 
 #train model
 epochs = 25
@@ -530,6 +532,7 @@ with tf.Session() as sess:
     merged = tf.summary.merge_all()
     sess.run(tf.global_variables_initializer())
     if os.path.exists('logs/model.meta'):
+        print("detected model in logs/model , restoring ... ")
         saver.restore(sess, 'logs/model')
     writer = tf.summary.FileWriter('tensorboard/lm', tf.get_default_graph())
     for k in range(epochs):
@@ -550,6 +553,9 @@ with tf.Session() as sess:
     writer.close()
 
 
+
+
+print("Train done. Ready to predict.")
 #prediciton
 arg.is_training = False
 

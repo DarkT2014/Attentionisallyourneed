@@ -27,6 +27,16 @@ OUTPUT_DIR_DATA="${OUTPUT_DIR}/data"
 
 mkdir -p $OUTPUT_DIR_DATA
 
+echo "Downloading cwmt file . This may take a while ..."
+wget -nc -P ${OUTPUT_DIR_DATA} https://s3-us-west-2.amazonaws.com/twairball.wmt17.zh-en/cwmt.tgz
+
+echo "unzipping cwmt file"
+tar -zxvf "${OUTPUT_DIR_DATA}/cwmt.tgz" -C "${OUTPUT_DIR_DATA}"
+
+echo "unzipping dev and test file .."
+tar -zxvf "${HOME}/dev.tgz" -C "${OUTPUT_DIR_DATA}"
+tar -zxvf "${HOME}/test.tgz" -C "${OUTPUT_DIR_DATA}"
+
 # echo "Downloading Europarl v7. This may take a while..."
 # wget -nc -nv -O ${OUTPUT_DIR_DATA}/europarl-v7-zh-en.tgz \
 #   http://www.statmt.org/europarl/v7/zh-en.tgz
