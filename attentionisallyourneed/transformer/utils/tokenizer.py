@@ -133,9 +133,13 @@ class Subtokenizer(object):
   def encode(self, raw_string, add_eos=False):
     """Encodes a string into a list of int subtoken ids."""
     ret = []
+    print('the raw string is : ')
     print(raw_string)
+    print('-----')
     tokens = _split_string_to_tokens(_native_to_unicode(raw_string))
+    print("the tokens are :")
     print(tokens)
+    print('--')
     print(type(tokens))
     for token in tokens:
       ret.extend(self._token_to_subtoken_ids(token))
