@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
 
     
-    zh_subtoken_list = []
+    zh_subtoken_list = ['<PAD>', '<GO>', '<EOS>']
     totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
     global start_time
     start_time = time.time()

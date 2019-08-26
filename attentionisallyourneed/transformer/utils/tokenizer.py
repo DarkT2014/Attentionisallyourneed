@@ -134,8 +134,9 @@ class Subtokenizer(object):
     """Encodes a string into a list of int subtoken ids."""
     ret = []
     print(raw_string)
-    print(type(raw_string))
     tokens = _split_string_to_tokens(_native_to_unicode(raw_string))
+    print(tokens)
+    print(type(tokens))
     for token in tokens:
       ret.extend(self._token_to_subtoken_ids(token))
     if add_eos:
