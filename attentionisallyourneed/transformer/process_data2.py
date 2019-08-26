@@ -64,9 +64,12 @@ def create_tf_record(source_files, vocab_files, out_dir, mode, total_shards):
     target_file = source_files[1]
     counter = 0
     shard = 0
-    for input_line, target_line in zip(iterator_file(input_file), iterator_file(target_file)):
+    for input_tuple, target_tuple in zip(iterator_file(input_file), iterator_file(target_file)):
         counter += 1
 
+        input_line = input_tuple[1]
+        target_line = target_tuple[1]
+        
         if counter > 0 and counter % 100000 == 0:
             tf.logging.info("\tSaving case %d." % counter)
         print("input line :" + input_line)
