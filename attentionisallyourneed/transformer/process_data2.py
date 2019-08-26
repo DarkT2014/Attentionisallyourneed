@@ -66,12 +66,13 @@ def create_tf_record(source_files, vocab_files, out_dir, mode, total_shards):
     shard = 0
     for input_line, target_line in zip(iterator_file(input_file), iterator_file(target_file)):
         counter += 1
-        
+
         if counter > 0 and counter % 100000 == 0:
             tf.logging.info("\tSaving case %d." % counter)
-
+        print("input line :" + input_line)
+        print("target line : " + target_line)
         example_dict = {
-            'inputs':  input_encoder.encode(input_line, True),
+            'inputs':  input_encoder.encode(input_line[1], True),
             'targets': target_encoder.encode(target_line, True)
         }
 
