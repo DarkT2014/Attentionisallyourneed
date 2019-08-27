@@ -117,18 +117,12 @@ if __name__ == '__main__':
     doIt = True
     if os.path.exists(zh_vocab):
         res = raw_input("Detected zh vocab file, skip it?(Y/N)")
-        print(res)
         if res.lower() == 'n':
             doIt = True
-            print(doIt)
-        elif res.lower() == ('y' or ''):
+        elif res.lower() == ('y' and ''):
             doIt = False
-            print(doIt)
     else:
-        doIt = True
-        print(doIt)
-    print('------------------')
-    print(doIt)            
+        doIt = True          
 
 
     if doIt:
@@ -153,9 +147,11 @@ if __name__ == '__main__':
             zh_subtoken_list.extend(jieba.lcut(line))
         print("\n Cut list done.")
     else:
+        print("reading existed zh vocab file ...")
         with io.open(zh_vocab, encoding='utf8') as f:
             for line in f:
                 zh_subtoken_list.extend(line)
+        print("done.")
     
     print("--------------------------------")
     
@@ -176,7 +172,7 @@ if __name__ == '__main__':
     # data_dir = './train_data'
     data_dir = '/tmp/t2t_datagen/'
 
-    print("create train_tfrecord")
+    print("\nBegin to creating train_tfrecord\n")
 
     create_tf_record([en_source_file, zh_source_file], [en_vocab, zh_vocab], data_dir, 'train', 10 )
 
