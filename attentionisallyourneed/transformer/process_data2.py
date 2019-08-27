@@ -120,7 +120,7 @@ if __name__ == '__main__':
         res = raw_input("Detected zh vocab file, skip it?(Y/N)")
         if res.lower() == 'n':
             doIt = True
-        elif res.lower() == ('y' and ''):
+        elif res.lower() == 'y':
             doIt = False
     else:
         doIt = True          
