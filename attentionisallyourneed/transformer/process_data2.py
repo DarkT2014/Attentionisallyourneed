@@ -139,7 +139,7 @@ if __name__ == '__main__':
             line = line.replace("\r","").replace("\n","")
             if(time.time() - last_time > 0.1):#print per 0.1sec
                 last_time = time.time()
-                percent = (i+1)/int(tot     alLineNum) * 100
+                percent = (i+1)/int(totalLineNum) * 100
                 duration = time.time() - start_time
                 sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
                 # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
