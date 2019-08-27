@@ -145,7 +145,7 @@ if __name__ == '__main__':
                 # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
                 sys.stdout.flush()
             zh_subtoken_list.extend(jieba.lcut(line))
-            print("\nCut list done.")
+        print("\nCut list done.")
     else:
         with os.open(zh_vocab, encoding='utf8') as f:
             for line in f:
