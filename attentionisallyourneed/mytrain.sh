@@ -1,0 +1,1 @@
+DATA_DIR=/tmp/t2t_datagen/

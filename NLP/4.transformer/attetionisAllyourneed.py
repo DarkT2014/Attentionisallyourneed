@@ -44,21 +44,66 @@ def iterator_file(file_path):
             yield i,line
 
 
-totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
-global start_time
-start_time = time.time()
-last_time = time.time()
-for i, line in iterator_file(zh_source_file):
-    line = line.replace("\r","").replace("\n","")
-    if(time.time() - last_time > 0.1):#print per 0.1sec
+# totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
+# global start_time
+# start_time = time.time()
+# last_time = time.time()
+# for i, line in iterator_file(zh_source_file):
+#     line = line.replace("\r","").replace("\n","")
+#     if(time.time() - last_time > 0.1):#print per 0.1sec
+#         last_time = time.time()
+#         percent = (i+1)/int(totalLineNum) * 100
+#         duration = time.time() - start_time
+#         sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
+#         # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
+#         sys.stdout.flush()
+#     outputs.extend(jieba.lcut(line))
+# print("zh subword done.")
+
+outputs = []
+    doIt = True
+    if os.path.exists(zh_vocab_file):
+        res = raw_input("Detected zh vocab file, skip it?(Y/N)")
+        if res.lower() == 'n':
+            doIt = True
+        elif res.lower() == ('y' and ''):
+            doIt = False
+    else:
+        doIt = True          
+
+
+    if doIt:
+        outputs = ['<PAD>', '<GO>', '<EOS>']
+        totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
+        global start_time
+        start_time = time.time()
+        # jieba.enable_parallel(4)
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+
+        jieba.load_userdict(os.path.join(dir_path, 'mydict.txt'))
         last_time = time.time()
-        percent = (i+1)/int(totalLineNum) * 100
-        duration = time.time() - start_time
-        sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
-        # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
-        sys.stdout.flush()
-    outputs.extend(jieba.lcut(line))
+        for i, line in iterator_file(zh_source_file):
+            line = line.replace("\r","").replace("\n","")
+            if(time.time() - last_time > 0.1):#print per 0.1sec
+                last_time = time.time()
+                percent = (i+1)/int(totalLineNum) * 100
+                duration = time.time() - start_time
+                sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
+                # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
+                sys.stdout.flush()
+            outputs.extend(jieba.lcut(line))
+        print("\n Cut list done.")
+    else:
+        print("reading existed zh vocab file ...")
+        with io.open(zh_vocab, encoding='utf8') as f:
+            for line in f:
+                outputs.extend(line)
+        
+
 print("zh subword done.")
+print("Saving zh vocab files ...")
+_save_vocab_file(outputs, zh_vocab_file)
+
 
 print(outputs[:15])
 
