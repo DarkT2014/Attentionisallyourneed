@@ -113,29 +113,35 @@ if __name__ == '__main__':
     # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
     #     zh_vocab, [zh_source_file],  2**15, 20,
     #     min_count=None, file_byte_limit=1e8)
+    zh_subtoken_list = []
+    if os.path.exists(zh_vocab):
+        res = input("Detected zh vocab file, skip it?(Y/N)")
+        if res.lower() is 'n':    
+            zh_subtoken_list = ['<PAD>', '<GO>', '<EOS>']
+            totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
+            global start_time
+            start_time = time.time()
+            # jieba.enable_parallel(4)
+            dir_path = os.path.dirname(os.path.realpath(__file__))
 
-
-    
-    zh_subtoken_list = ['<PAD>', '<GO>', '<EOS>']
-    totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
-    global start_time
-    start_time = time.time()
-    # jieba.enable_parallel(4)
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-
-    jieba.load_userdict(os.path.join(dir_path, 'mydict.txt'))
-    last_time = time.time()
-    for i, line in iterator_file(zh_source_file):
-        line = line.replace("\r","").replace("\n","")
-        if(time.time() - last_time > 0.1):#print per 0.1sec
+            jieba.load_userdict(os.path.join(dir_path, 'mydict.txt'))
             last_time = time.time()
-            percent = (i+1)/int(totalLineNum) * 100
-            duration = time.time() - start_time
-            sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
-            # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
-            sys.stdout.flush()
-        zh_subtoken_list.extend(jieba.lcut(line))
-    print("\nCut list done.")
+            for i, line in iterator_file(zh_source_file):
+                line = line.replace("\r","").replace("\n","")
+                if(time.time() - last_time > 0.1):#print per 0.1sec
+                    last_time = time.time()
+                    percent = (i+1)/int(totalLineNum) * 100
+                    duration = time.time() - start_time
+                    sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
+                    # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
+                    sys.stdout.flush()
+                zh_subtoken_list.extend(jieba.lcut(line))
+                print("\nCut list done.")
+        else:
+            with os.open(zh_vocab, encoding='utf8') as f:
+                for line in f:
+                    zh_subtoken_list.extend(line)
+    
     print("--------------------------------")
     
     
