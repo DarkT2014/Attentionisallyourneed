@@ -121,7 +121,7 @@ if __name__ == '__main__':
         if res.lower() == 'n':
             doIt = True
             print(doIt)
-        elif res.lower() == 'y' or '':
+        elif res.lower() == ('y' or ''):
             doIt = False
             print(doIt)
     else:
