@@ -121,6 +121,7 @@ if __name__ == '__main__':
     global start_time
     start_time = time.time()
     # jieba.enable_parallel(4)
+    jieba.load_userdict('./mydict.txt')
     last_time = time.time()
     for i, line in iterator_file(zh_source_file):
         line = line.replace("\r","").replace("\n","")
