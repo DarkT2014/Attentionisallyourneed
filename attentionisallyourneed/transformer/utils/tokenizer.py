@@ -155,7 +155,6 @@ class Subtokenizer(object):
       return cache_value
 
 
-    print(self.subtoken_to_id_dict)#byme
     ret = _split_token_to_subtokens(
         _escape_token(token, self.alphabet), self.subtoken_to_id_dict,
         self.max_subtoken_length)
