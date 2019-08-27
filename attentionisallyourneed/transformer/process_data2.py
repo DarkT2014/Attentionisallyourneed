@@ -114,15 +114,20 @@ if __name__ == '__main__':
     #     zh_vocab, [zh_source_file],  2**15, 20,
     #     min_count=None, file_byte_limit=1e8)
     zh_subtoken_list = []
-    
+    doIt = True
     if os.path.exists(zh_vocab):
         res = raw_input("Detected zh vocab file, skip it?(Y/N)")
         if res.lower() is 'n':
             doIt = True
+            print(doIt)
         elif res.lower() is 'y' or '':
             doIt = False
+            print(doIt)
     else:
-        doIt = True            
+        doIt = True
+        print(doIt)
+    print('------------------')
+    print(doIt)            
 
 
     if doIt:
