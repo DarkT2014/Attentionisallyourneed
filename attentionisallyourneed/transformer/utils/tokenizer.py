@@ -399,6 +399,10 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
       # If there is no possible encoding of the escaped token then one of the
       # characters in the token is not in the alphabet. This should be
       # impossible and would be indicative of a bug.
+      
+      print(token)
+      print('--------------------------------')
+      print(subtoken_dict)
       raise ValueError("Was unable to split token \"%s\" into subtokens." %
                        token)
   return ret

@@ -90,7 +90,9 @@ print(decoder_vocab[:10])
 
 print("resize encode inputs ...")
 encoder_inputs = [[encoder_vocab.index(word) for word in line] for line in inputs]
+print("encoder done. begin decoder inputs ..")
 decoder_inputs = [[decoder_vocab.index('<GO>')] + [decoder_vocab.index(word) for word in line] for line in outputs]
+print("decoder inputs done.  Begin decoder targets ...")
 decoder_targets = [[decoder_vocab.index(word) for word in line] + [decoder_vocab.index('<EOS>')] for line in outputs]
 
 def get_batch(encoder_inputs, decoder_inputs, decoder_targets, batch_size=4):
