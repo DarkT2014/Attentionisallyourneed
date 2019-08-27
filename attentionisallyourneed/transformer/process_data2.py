@@ -117,10 +117,11 @@ if __name__ == '__main__':
     doIt = True
     if os.path.exists(zh_vocab):
         res = raw_input("Detected zh vocab file, skip it?(Y/N)")
-        if res.lower() is 'n':
+        print(res)
+        if res.lower() == 'n':
             doIt = True
             print(doIt)
-        elif res.lower() is 'y' or '':
+        elif res.lower() == 'y' or '':
             doIt = False
             print(doIt)
     else:
