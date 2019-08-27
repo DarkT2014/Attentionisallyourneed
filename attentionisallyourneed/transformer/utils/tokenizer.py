@@ -405,7 +405,7 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
       print(bugtoken)
       # print(token)
       print('--------------------------------')
-      print(subtoken_dict)
+      # print(subtoken_dict)
       raise ValueError("Was unable to split token \"%s\" into subtokens." %
                        token)
   return ret
