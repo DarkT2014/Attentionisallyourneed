@@ -153,7 +153,7 @@ if __name__ == '__main__':
             zh_subtoken_list.extend(jieba.lcut(line))
         print("\n Cut list done.")
     else:
-        with os.open(zh_vocab, encoding='utf8') as f:
+        with io.open(zh_vocab, encoding='utf8') as f:
             for line in f:
                 zh_subtoken_list.extend(line)
     
