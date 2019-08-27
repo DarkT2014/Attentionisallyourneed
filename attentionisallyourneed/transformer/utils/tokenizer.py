@@ -387,10 +387,13 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
   ret = []
   start = 0
   token_len = len(token)
+
+  bugtoken = ''#byme
   while start < token_len:
     # Find the longest subtoken, so iterate backwards.
     for end in xrange(min(token_len, start + max_subtoken_length), start, -1):
       subtoken = token[start:end]
+      bugtoken = subtoken
       if subtoken in subtoken_dict:
         ret.append(subtoken)
         start = end
@@ -399,8 +402,8 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
       # If there is no possible encoding of the escaped token then one of the
       # characters in the token is not in the alphabet. This should be
       # impossible and would be indicative of a bug.
-      
-      print(token)
+      print(bugtoken)
+      # print(token)
       print('--------------------------------')
       print(subtoken_dict)
       raise ValueError("Was unable to split token \"%s\" into subtokens." %
