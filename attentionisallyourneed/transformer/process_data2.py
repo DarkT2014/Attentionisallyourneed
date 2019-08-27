@@ -116,7 +116,7 @@ if __name__ == '__main__':
     zh_subtoken_list = []
     doIt = True
     if os.path.exists(zh_vocab):
-        res = input("Detected zh vocab file, skip it?(Y/N)")
+        res = raw_input("Detected zh vocab file, skip it?(Y/N)")
         if res.lower() is 'n':
             doIt = True
         elif res.lower() is 'y' or '':
