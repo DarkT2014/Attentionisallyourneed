@@ -114,7 +114,7 @@ if __name__ == '__main__':
     #     zh_vocab, [zh_source_file],  2**15, 20,
     #     min_count=None, file_byte_limit=1e8)
     zh_subtoken_list = []
-    doIt = True
+    
     if os.path.exists(zh_vocab):
         res = raw_input("Detected zh vocab file, skip it?(Y/N)")
         if res.lower() is 'n':
@@ -145,7 +145,7 @@ if __name__ == '__main__':
                 # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
                 sys.stdout.flush()
             zh_subtoken_list.extend(jieba.lcut(line))
-        print("\nCut list done.")
+        print("\n Cut list done.")
     else:
         with os.open(zh_vocab, encoding='utf8') as f:
             for line in f:
