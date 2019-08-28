@@ -8,11 +8,13 @@ MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
 INPUT_VOCAB=$DATA_DIR/en_sub_word.vocab
 TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
 
-UPDIR=$(dirname "$PWD")
+UPDIR=$(dirname $(pwd))
+
 echo $UPDIR
 export PYTHONPATH="$PYTHONPATH:$UPDIR/models"
 echo 'the python path is:'
 echo $PYTHONPATH
+echo $(dirname $(pwd))
 pip install --user -r $UPDIR/models/official/requirements.txt
 
 python $UPDIR/models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --input_vocab_file $INPUT_VOCAB --target_vocab_file $TARGET_VOCAB
