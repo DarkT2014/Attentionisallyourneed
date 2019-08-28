@@ -13,7 +13,7 @@ TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
 # echo $PYTHONPATH
 # pip install --user -r models/official/requirements.txt
 
-python transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --input_vocab_file $INPUT_VOCAB --target_vocab_file $TARGET_VOCAB
+python transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --input_vocab_file $INPUT_VOCAB --target_vocab_file $TARGET_VOCAB
     
 
     # --param_set=$PARAM_SET
