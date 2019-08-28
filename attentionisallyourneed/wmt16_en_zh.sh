@@ -124,6 +124,8 @@ cp ${OUTPUT_DIR_DATA}/dev/dev/newstest20*.en ${OUTPUT_DIR}
 cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.zh ${OUTPUT_DIR}
 cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.en ${OUTPUT_DIR}
 
+
+
 # Tokenize data
 # for f in ${OUTPUT_DIR}/*.zh; do
 #   echo "Tokenizing $f..."

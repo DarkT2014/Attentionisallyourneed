@@ -23,8 +23,10 @@ _TRAIN_DATA = {
 
 
 _DEV_DATA = {
-    'inputs': 'dev.en',
-    'targets': 'dev.zh'
+    # 'inputs': 'dev.en',
+    # 'targets': 'dev.zh'
+    'inputs': 'newstest2017.en',
+    'targets': 'newstest2017.zh'
 }
 
 
@@ -121,6 +123,8 @@ if __name__ == '__main__':
         if res.lower() == 'n':
             doIt = True
         elif res.lower() == 'y':
+            doIt = False
+        elif res == '':
             doIt = False
     else:
         doIt = True          
