@@ -9,7 +9,7 @@ INPUT_VOCAB=$DATA_DIR/en_sub_word.vocab
 TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
 
 
-export PYTHONPATH="$PYTHONPATH:${$PWD}/models"
+export PYTHONPATH="$PYTHONPATH:$PWD/models"
 echo $PYTHONPATH
 pip install --user -r models/official/requirements.txt
 
