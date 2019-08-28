@@ -24,12 +24,12 @@ from __future__ import print_function
 
 import tensorflow as tf  # pylint: disable=g-bad-import-order
 
-from official.transformer.model import attention_layer
-from official.transformer.model import beam_search
-from official.transformer.model import embedding_layer
-from official.transformer.model import ffn_layer
-from official.transformer.model import model_utils
-from official.transformer.utils.tokenizer import EOS_ID
+from transformer.model import attention_layer
+from transformer.model import beam_search
+from transformer.model import embedding_layer
+from transformer.model import ffn_layer
+from transformer.model import model_utils
+from transformer.utils.tokenizer import EOS_ID
 
 _NEG_INF = -1e9
 
@@ -56,9 +56,12 @@ class Transformer(object):
     self.train = train
     self.params = params
 
-    self.embedding_softmax_layer = embedding_layer.EmbeddingSharedWeights(
-        params["vocab_size"], params["hidden_size"],
-        method="matmul" if params["tpu"] else "gather")
+    self.inputs_embedding_softmax_layer = embedding_layer.EmbeddingSharedWeights(
+        params["inputs_vocab_size"], params["hidden_size"], "inputs","gather")
+
+    self.targets_embedding_softmax_layer = embedding_layer.EmbeddingSharedWeights(
+        params["targets_vocab_size"], params["hidden_size"], "targets","gather")
+
     self.encoder_stack = EncoderStack(params, train)
     self.decoder_stack = DecoderStack(params, train)
 
@@ -111,13 +114,15 @@ class Transformer(object):
     with tf.name_scope("encode"):
       # Prepare inputs to the layer stack by adding positional encodings and
       # applying dropout.
-      embedded_inputs = self.embedding_softmax_layer(inputs)
+      embedded_inputs = self.inputs_embedding_softmax_layer(inputs)
       inputs_padding = model_utils.get_padding(inputs)
 
       with tf.name_scope("add_pos_encoding"):
         length = tf.shape(embedded_inputs)[1]
+
         pos_encoding = model_utils.get_position_encoding(
             length, self.params["hidden_size"])
+
         encoder_inputs = embedded_inputs + pos_encoding
 
       if self.train:
@@ -142,7 +147,7 @@ class Transformer(object):
     with tf.name_scope("decode"):
       # Prepare inputs to decoder layers by shifting targets, adding positional
       # encoding and applying dropout.
-      decoder_inputs = self.embedding_softmax_layer(targets)
+      decoder_inputs = self.targets_embedding_softmax_layer(targets)
       with tf.name_scope("shift_targets"):
         # Shift targets to the right, and remove the last element
         decoder_inputs = tf.pad(
@@ -161,7 +166,7 @@ class Transformer(object):
       outputs = self.decoder_stack(
           decoder_inputs, encoder_outputs, decoder_self_attention_bias,
           attention_bias)
-      logits = self.embedding_softmax_layer.linear(outputs)
+      logits = self.targets_embedding_softmax_layer.linear(outputs)
       return logits
 
   def _get_symbols_to_logits_fn(self, max_decode_length):
@@ -191,14 +196,14 @@ class Transformer(object):
       decoder_input = ids[:, -1:]
 
       # Preprocess decoder input by getting embeddings and adding timing signal.
-      decoder_input = self.embedding_softmax_layer(decoder_input)
+      decoder_input = self.targets_embedding_softmax_layer(decoder_input)
       decoder_input += timing_signal[i:i + 1]
 
       self_attention_bias = decoder_self_attention_bias[:, :, i:i + 1, :i + 1]
       decoder_outputs = self.decoder_stack(
           decoder_input, cache.get("encoder_outputs"), self_attention_bias,
           cache.get("encoder_decoder_attention_bias"), cache)
-      logits = self.embedding_softmax_layer.linear(decoder_outputs)
+      logits = self.targets_embedding_softmax_layer.linear(decoder_outputs)
       logits = tf.squeeze(logits, axis=[1])
       return logits, cache
     return symbols_to_logits_fn
@@ -230,7 +235,7 @@ class Transformer(object):
         symbols_to_logits_fn=symbols_to_logits_fn,
         initial_ids=initial_ids,
         initial_cache=cache,
-        vocab_size=self.params["vocab_size"],
+        vocab_size=self.params["targets_vocab_size"],
         beam_size=self.params["beam_size"],
         alpha=self.params["alpha"],
         max_decode_length=max_decode_length,

@@ -68,6 +68,7 @@ def padded_cross_entropy_loss(logits, labels, smoothing, vocab_size):
     with tf.name_scope("smoothing_cross_entropy", [logits, labels]):
       confidence = 1.0 - smoothing
       low_confidence = (1.0 - confidence) / tf.to_float(vocab_size - 1)
+
       soft_targets = tf.one_hot(
           tf.cast(labels, tf.int32),
           depth=vocab_size,
@@ -118,7 +119,7 @@ def get_eval_metrics(logits, labels, params):
       "accuracy_per_sequence": _convert_to_eval_metric(
           padded_sequence_accuracy)(logits, labels),
       "neg_log_perplexity": _convert_to_eval_metric(padded_neg_log_perplexity)(
-          logits, labels, params["vocab_size"]),
+          logits, labels, params["targets_vocab_size"]),
   }
 
   if not params["use_tpu"]:

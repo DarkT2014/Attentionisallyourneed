@@ -89,7 +89,7 @@ class Subtokenizer(object):
     Args:
       vocab_file: String name of vocab file to store subtoken vocabulary.
       files: List of file paths that will be used to generate vocabulary.
-      target_vocab_size: target vocabulary size to generate.
+      target_vocab_size:  
       threshold: int threshold of vocabulary size to accept.
       min_count: int minimum count to use for generating the vocabulary. The min
         count is the minimum number of times a subtoken should appear in the
@@ -107,23 +107,40 @@ class Subtokenizer(object):
       reserved_tokens = RESERVED_TOKENS
 
     if tf.gfile.Exists(vocab_file):
-      tf.logging.info("Vocab file already exists (%s)" % vocab_file)
+      # tf.logging.info("Vocab file already exists (%s)" % vocab_file)
+      print("Vocab file already exists (%s)" % vocab_file)
+
     else:
-      tf.logging.info("Begin steps to create subtoken vocabulary...")
+      # tf.logging.info("Begin steps to create subtoken vocabulary...")
+      print("Begin steps to create subtoken vocabulary...")
       token_counts = _count_tokens(files, file_byte_limit)
+      print("count token done.")
+      print("Generating alphabet dict ...")
       alphabet = _generate_alphabet_dict(token_counts)
+      print("Genrate alpha dict done.")
+      print("Begin to generate subtokens with target vocab size ...")
       subtoken_list = _generate_subtokens_with_target_vocab_size(
           token_counts, alphabet, target_vocab_size, threshold, min_count,
           reserved_tokens)
-      tf.logging.info("Generated vocabulary with %d subtokens." %
+      # tf.logging.info("Generated vocabulary with %d subtokens." %
+                      # len(subtoken_list))
+      print("Generated vocabulary with %d subtokens." %
                       len(subtoken_list))
       _save_vocab_file(vocab_file, subtoken_list)
-    return Subtokenizer(vocab_file)
+      print("save file done.")
+    # return Subtokenizer(vocab_file)
 
   def encode(self, raw_string, add_eos=False):
     """Encodes a string into a list of int subtoken ids."""
     ret = []
+    # print('the raw string is : ')
+    # print(raw_string)
+    # print('-----')
     tokens = _split_string_to_tokens(_native_to_unicode(raw_string))
+    # print("the tokens are :")
+    # print(tokens)
+    # print('--')
+    # print(type(tokens))
     for token in tokens:
       ret.extend(self._token_to_subtoken_ids(token))
     if add_eos:
@@ -136,6 +153,7 @@ class Subtokenizer(object):
     cache_key, cache_value = self._cache[cache_location]
     if cache_key == token:
       return cache_value
+
 
     ret = _split_token_to_subtokens(
         _escape_token(token, self.alphabet), self.subtoken_to_id_dict,
@@ -369,10 +387,13 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
   ret = []
   start = 0
   token_len = len(token)
+
+  bugtoken = ''#byme
   while start < token_len:
     # Find the longest subtoken, so iterate backwards.
     for end in xrange(min(token_len, start + max_subtoken_length), start, -1):
       subtoken = token[start:end]
+      bugtoken = subtoken
       if subtoken in subtoken_dict:
         ret.append(subtoken)
         start = end
@@ -381,6 +402,10 @@ def _split_token_to_subtokens(token, subtoken_dict, max_subtoken_length):
       # If there is no possible encoding of the escaped token then one of the
       # characters in the token is not in the alphabet. This should be
       # impossible and would be indicative of a bug.
+      print(bugtoken)
+      # print(token)
+      print('--------------------------------')
+      # print(subtoken_dict)
       raise ValueError("Was unable to split token \"%s\" into subtokens." %
                        token)
   return ret
@@ -595,6 +620,7 @@ def _generate_subtokens(
   # the dictionary with subtokens w/ high enough counts.
   for i in xrange(num_iterations):
     tf.logging.info("\tGenerating subtokens: iteration %d" % i)
+    print("\tGenerating subtokens: iteration %d" % i)
     # Generate new subtoken->id dictionary using the new subtoken list.
     subtoken_dict = _list_to_index_dict(subtoken_list)
 
@@ -608,4 +634,5 @@ def _generate_subtokens(
         subtoken_counts, min_count, alphabet, reserved_tokens)
 
     tf.logging.info("\tVocab size: %d" % len(subtoken_list))
+    print("\tVocab size: %d" % len(subtoken_list))
   return subtoken_list

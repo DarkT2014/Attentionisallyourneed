@@ -20,14 +20,13 @@ from __future__ import print_function
 
 import tensorflow as tf  # pylint: disable=g-bad-import-order
 
-from official.transformer.model import model_utils
-from official.utils.accelerator import tpu as tpu_utils
+from transformer.model import model_utils
 
 
 class EmbeddingSharedWeights(tf.layers.Layer):
   """Calculates input embeddings and pre-softmax linear with shared weights."""
 
-  def __init__(self, vocab_size, hidden_size, method="gather"):
+  def __init__(self, vocab_size, hidden_size, name_prefix, method="gather"):
     """Specify characteristic parameters of embedding layer.
 
     Args:
@@ -43,12 +42,14 @@ class EmbeddingSharedWeights(tf.layers.Layer):
     super(EmbeddingSharedWeights, self).__init__()
     self.vocab_size = vocab_size
     self.hidden_size = hidden_size
-    if method not in ("gather", "matmul"):
-      raise ValueError("method {} must be 'gather' or 'matmul'".format(method))
+    if method not in ("gather"):
+      raise ValueError("method {} must be 'gather' '".format(method))
+
     self.method = method
+    self.name_prefix = name_prefix
 
   def build(self, _):
-    with tf.variable_scope("embedding_and_softmax", reuse=tf.AUTO_REUSE):
+    with tf.variable_scope(self.name_prefix + "_embedding_and_softmax", reuse=tf.AUTO_REUSE):
       # Create and initialize weights. The random normal initializer was chosen
       # randomly, and works well.
       self.shared_weights = tf.get_variable(
@@ -68,22 +69,13 @@ class EmbeddingSharedWeights(tf.layers.Layer):
       padding: float32 tensor with shape [batch_size, length] indicating the
         locations of the padding tokens in x.
     """
-    with tf.name_scope("embedding"):
+    with tf.name_scope(self.name_prefix+"_embedding"):
       # Create binary mask of size [batch_size, length]
       mask = tf.to_float(tf.not_equal(x, 0))
 
-      if self.method == "gather":
-        embeddings = tf.gather(self.shared_weights, x)
-        embeddings *= tf.expand_dims(mask, -1)
-      else:  # matmul
-        embeddings = tpu_utils.embedding_matmul(
-            embedding_table=self.shared_weights,
-            values=tf.cast(x, dtype=tf.int32),
-            mask=mask
-        )
-        # embedding_matmul already zeros out masked positions, so
-        # `embeddings *= tf.expand_dims(mask, -1)` is unnecessary.
-
+      embeddings = tf.gather(self.shared_weights, x)
+      # TODO padding embedding is zero wu.zheng
+      embeddings *= tf.expand_dims(mask, -1)
 
       # Scale embedding by the sqrt of the hidden size
       embeddings *= self.hidden_size ** 0.5
@@ -99,7 +91,7 @@ class EmbeddingSharedWeights(tf.layers.Layer):
     Returns:
       float32 tensor with shape [batch_size, length, vocab_size].
     """
-    with tf.name_scope("presoftmax_linear"):
+    with tf.name_scope(self.name_prefix + "_presoftmax_linear"):
       batch_size = tf.shape(x)[0]
       length = tf.shape(x)[1]
 
