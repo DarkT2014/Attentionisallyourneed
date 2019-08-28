@@ -33,8 +33,7 @@ from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
 
-from official.transformer.utils import metrics
-from official.utils.flags import core as flags_core
+from transformer.utils import metrics
 
 
 class UnicodeRegex(object):
@@ -114,20 +113,19 @@ def define_compute_bleu_flags():
   """Add flags for computing BLEU score."""
   flags.DEFINE_string(
       name="translation", default=None,
-      help=flags_core.help_wrap("File containing translated text."))
+      help="File containing translated text.")
   flags.mark_flag_as_required("translation")
 
   flags.DEFINE_string(
       name="reference", default=None,
-      help=flags_core.help_wrap("File containing reference translation."))
+      help="File containing reference translation.")
   flags.mark_flag_as_required("reference")
 
   flags.DEFINE_enum(
       name="bleu_variant", short_name="bv", default="both",
       enum_values=["both", "uncased", "cased"], case_sensitive=False,
-      help=flags_core.help_wrap(
-          "Specify one or more BLEU variants to calculate. Variants: \"cased\""
-          ", \"uncased\", or \"both\"."))
+      help="Specify one or more BLEU variants to calculate. Variants: \"cased\""
+          ", \"uncased\", or \"both\".")
 
 
 if __name__ == "__main__":

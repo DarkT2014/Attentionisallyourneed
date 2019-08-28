@@ -17,7 +17,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import sys
+sys.path.append("/Users/zhengwu/workspace/oschina/translate")
 import os
 import random
 import tarfile
@@ -30,8 +31,7 @@ from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
 
-from official.transformer.utils import tokenizer
-from official.utils.flags import core as flags_core
+from transformer.utils import tokenizer
 
 # Data sources for training/evaluating the transformer translation model.
 # If any of the training sources are changed, then either:
@@ -40,6 +40,7 @@ from official.utils.flags import core as flags_core
 # min_count is the minimum number of times a token must appear in the data
 # before it is added to the vocabulary. "Best min count" refers to the value
 # that generates a vocabulary set that is closest in size to _TARGET_VOCAB_SIZE.
+
 _TRAIN_DATA_SOURCES = [
     {
         "url": "http://data.statmt.org/wmt17/translation-task/"
@@ -47,19 +48,38 @@ _TRAIN_DATA_SOURCES = [
         "input": "news-commentary-v12.de-en.en",
         "target": "news-commentary-v12.de-en.de",
     },
-    {
-        "url": "http://www.statmt.org/wmt13/training-parallel-commoncrawl.tgz",
-        "input": "commoncrawl.de-en.en",
-        "target": "commoncrawl.de-en.de",
-    },
-    {
-        "url": "http://www.statmt.org/wmt13/training-parallel-europarl-v7.tgz",
-        "input": "europarl-v7.de-en.en",
-        "target": "europarl-v7.de-en.de",
-    },
+    # {
+    #     "url": "http://www.statmt.org/wmt13/training-parallel-commoncrawl.tgz",
+    #     "input": "commoncrawl.de-en.en",
+    #     "target": "commoncrawl.de-en.de",
+    # },
+    # {
+    #     "url": "http://www.statmt.org/wmt13/training-parallel-europarl-v7.tgz",
+    #     "input": "europarl-v7.de-en.en",
+    #     "target": "europarl-v7.de-en.de",
+    # },
 ]
+
+#
+# _TRAIN_DATA_SOURCES = [
+#     {
+#         "url":'',
+#         "input": "newstest2014.en",
+#         "target": "newstest2014.de",
+#     },
+# ]
+
+
 # Use pre-defined minimum count to generate subtoken vocabulary.
 _TRAIN_DATA_MIN_COUNT = 6
+#
+# _EVAL_DATA_SOURCES = [
+#     {
+#         "url":'',
+#         "input": "newstest2014.en",
+#         "target": "newstest2014.de",
+#     }
+# ]
 
 _EVAL_DATA_SOURCES = [
     {
@@ -68,7 +88,6 @@ _EVAL_DATA_SOURCES = [
         "target": "newstest2013.de",
     }
 ]
-
 # Vocabulary constants
 _TARGET_VOCAB_SIZE = 32768  # Number of subtokens in the vocabulary list.
 _TARGET_THRESHOLD = 327  # Accept vocabulary if size is within this threshold
@@ -401,17 +420,17 @@ def define_data_download_flags():
   """Add flags specifying data download arguments."""
   flags.DEFINE_string(
       name="data_dir", short_name="dd", default="/tmp/translate_ende",
-      help=flags_core.help_wrap(
-          "Directory for where the translate_ende_wmt32k dataset is saved."))
+      help="Directory for where the translate_ende_wmt32k dataset is saved.")
+
   flags.DEFINE_string(
       name="raw_dir", short_name="rd", default="/tmp/translate_ende_raw",
-      help=flags_core.help_wrap(
-          "Path where the raw data will be downloaded and extracted."))
+      help="Path where the raw data will be downloaded and extracted.")
+
   flags.DEFINE_bool(
       name="search", default=False,
-      help=flags_core.help_wrap(
+      help=
           "If set, use binary search to find the vocabulary set with size"
-          "closest to the target size (%d)." % _TARGET_VOCAB_SIZE))
+          "closest to the target size (%d)." % _TARGET_VOCAB_SIZE)
 
 
 if __name__ == "__main__":

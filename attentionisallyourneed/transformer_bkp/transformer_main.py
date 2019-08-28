@@ -22,8 +22,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import sys
 import os
-import tempfile
+_package_path = "/".join(os.path.abspath(os.path.dirname(__file__)).split("/")[:-1])
+sys.path.append(_package_path)
+
 
 # pylint: disable=g-bad-import-order
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -32,21 +35,21 @@ from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
 
-from official.transformer import compute_bleu
-from official.transformer import translate
-from official.transformer.model import model_params
-from official.transformer.model import transformer
-from official.transformer.utils import dataset
-from official.transformer.utils import metrics
-from official.transformer.utils import schedule
-from official.transformer.utils import tokenizer
-from official.utils.accelerator import tpu as tpu_util
-from official.utils.export import export
-from official.utils.flags import core as flags_core
-from official.utils.logs import hooks_helper
-from official.utils.logs import logger
-from official.utils.misc import distribution_utils
-from official.utils.misc import model_helpers
+from transformer import compute_bleu
+from transformer import translate
+from transformer.model import model_params
+from transformer.model import transformer
+from transformer.utils import dataset
+from transformer.utils import metrics
+from transformer.utils import schedule
+from transformer.utils import tokenizer
+
+from transformer.comm_utils.export import export
+from transformer.comm_utils.flags import core as flags_core
+from transformer.comm_utils.logs import hooks_helper
+from transformer.comm_utils.logs import logger
+from transformer.comm_utils.misc import distribution_utils
+from transformer.comm_utils.misc import model_helpers
 
 PARAMS_MAP = {
     "tiny": model_params.TINY_PARAMS,
@@ -79,8 +82,6 @@ def model_fn(features, labels, mode, params):
     # When in prediction mode, the labels/targets is None. The model output
     # is the prediction
     if mode == tf.estimator.ModeKeys.PREDICT:
-      if params["use_tpu"]:
-        raise NotImplementedError("Prediction is not yet supported on TPUs.")
       return tf.estimator.EstimatorSpec(
           tf.estimator.ModeKeys.PREDICT,
           predictions=logits,
@@ -101,39 +102,21 @@ def model_fn(features, labels, mode, params):
     # xentropy contains the cross entropy loss of every nonpadding token in the
     # targets.
     xentropy, weights = metrics.padded_cross_entropy_loss(
-        logits, targets, params["label_smoothing"], params["vocab_size"])
+        logits, targets, params["label_smoothing"], params["targets_vocab_size"])
     loss = tf.reduce_sum(xentropy) / tf.reduce_sum(weights)
 
     # Save loss as named tensor that will be logged with the logging hook.
     tf.identity(loss, "cross_entropy")
 
     if mode == tf.estimator.ModeKeys.EVAL:
-      if params["use_tpu"]:
-        # host call functions should only have tensors as arguments.
-        # This lambda pre-populates params so that metric_fn is
-        # TPUEstimator compliant.
-        metric_fn = lambda logits, labels: (
-            metrics.get_eval_metrics(logits, labels, params=params))
-        eval_metrics = (metric_fn, [logits, labels])
-        return tf.contrib.tpu.TPUEstimatorSpec(
-            mode=mode, loss=loss, predictions={"predictions": logits},
-            eval_metrics=eval_metrics)
       return tf.estimator.EstimatorSpec(
           mode=mode, loss=loss, predictions={"predictions": logits},
           eval_metric_ops=metrics.get_eval_metrics(logits, labels, params))
     else:
       train_op, metric_dict = get_train_op_and_metrics(loss, params)
-
       # Epochs can be quite long. This gives some intermediate information
       # in TensorBoard.
       metric_dict["minibatch_loss"] = loss
-      if params["use_tpu"]:
-        return tf.contrib.tpu.TPUEstimatorSpec(
-            mode=mode, loss=loss, train_op=train_op,
-            host_call=tpu_util.construct_scalar_host_call(
-                metric_dict=metric_dict, model_dir=params["model_dir"],
-                prefix="training/")
-        )
       record_scalars(metric_dict)
       return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
@@ -179,9 +162,6 @@ def get_train_op_and_metrics(loss, params):
         beta2=params["optimizer_adam_beta2"],
         epsilon=params["optimizer_adam_epsilon"])
 
-    if params["use_tpu"] and params["tpu"] != tpu_util.LOCAL:
-      optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
-
     # Calculate and apply gradients using LazyAdamOptimizer.
     global_step = tf.train.get_global_step()
     tvars = tf.trainable_variables()
@@ -194,30 +174,29 @@ def get_train_op_and_metrics(loss, params):
 
     train_metrics = {"learning_rate": learning_rate}
 
-    if not params["use_tpu"]:
       # gradient norm is not included as a summary when running on TPU, as
       # it can cause instability between the TPU and the host controller.
-      gradient_norm = tf.global_norm(list(zip(*gradients))[0])
-      train_metrics["global_norm/gradient_norm"] = gradient_norm
+    gradient_norm = tf.global_norm(list(zip(*gradients))[0])
+    train_metrics["global_norm/gradient_norm"] = gradient_norm
 
     return train_op, train_metrics
 
 
-def translate_and_compute_bleu(estimator, subtokenizer, bleu_source, bleu_ref):
-  """Translate file and report the cased and uncased bleu scores."""
-  # Create temporary file to store translation.
-  tmp = tempfile.NamedTemporaryFile(delete=False)
-  tmp_filename = tmp.name
-
-  translate.translate_file(
-      estimator, subtokenizer, bleu_source, output_file=tmp_filename,
-      print_all_translations=False)
-
-  # Compute uncased and cased bleu scores.
-  uncased_score = compute_bleu.bleu_wrapper(bleu_ref, tmp_filename, False)
-  cased_score = compute_bleu.bleu_wrapper(bleu_ref, tmp_filename, True)
-  os.remove(tmp_filename)
-  return uncased_score, cased_score
+#def translate_and_compute_bleu(estimator, subtokenizer, bleu_source, bleu_ref):
+#  """Translate file and report the cased and uncased bleu scores."""
+#  # Create temporary file to store translation.
+#  tmp = tempfile.NamedTemporaryFile(delete=False)
+#  tmp_filename = tmp.name
+#
+#  translate.translate_file(
+#      estimator, subtokenizer, bleu_source, output_file=tmp_filename,
+#      print_all_translations=False)
+#
+#  # Compute uncased and cased bleu scores.
+#  uncased_score = compute_bleu.bleu_wrapper(bleu_ref, tmp_filename, False)
+#  cased_score = compute_bleu.bleu_wrapper(bleu_ref, tmp_filename, True)
+#  os.remove(tmp_filename)
+#  return uncased_score, cased_score
 
 
 def get_global_step(estimator):
@@ -225,17 +204,17 @@ def get_global_step(estimator):
   return int(estimator.latest_checkpoint().split("-")[-1])
 
 
-def evaluate_and_log_bleu(estimator, bleu_source, bleu_ref, vocab_file):
-  """Calculate and record the BLEU score."""
-  subtokenizer = tokenizer.Subtokenizer(vocab_file)
-
-  uncased_score, cased_score = translate_and_compute_bleu(
-      estimator, subtokenizer, bleu_source, bleu_ref)
-
-  tf.logging.info("Bleu score (uncased):", uncased_score)
-  tf.logging.info("Bleu score (cased):", cased_score)
-  return uncased_score, cased_score
-
+#def evaluate_and_log_bleu(estimator, bleu_source, bleu_ref, vocab_file):
+#  """Calculate and record the BLEU score."""
+#  subtokenizer = tokenizer.Subtokenizer(vocab_file)
+#
+#  uncased_score, cased_score = translate_and_compute_bleu(
+#      estimator, subtokenizer, bleu_source, bleu_ref)
+#
+#  tf.logging.info("Bleu score (uncased):", uncased_score)
+#  tf.logging.info("Bleu score (cased):", cased_score)
+#  return uncased_score, cased_score
+#
 
 def _validate_file(filepath):
   """Make sure that file exists."""
@@ -245,7 +224,7 @@ def _validate_file(filepath):
 
 def run_loop(
     estimator, schedule_manager, train_hooks=None, benchmark_logger=None,
-    bleu_source=None, bleu_ref=None, bleu_threshold=None, vocab_file=None):
+    bleu_source=None, bleu_ref=None, bleu_threshold=None):
   """Train and evaluate model, and optionally compute model's BLEU score.
 
   **Step vs. Epoch vs. Iteration**
@@ -284,41 +263,35 @@ def run_loop(
       single_iteration_train_epochs were defined.
     NotFoundError: if the vocab file or bleu files don't exist.
   """
-  if bleu_source:
-    _validate_file(bleu_source)
-  if bleu_ref:
-    _validate_file(bleu_ref)
-  if vocab_file:
-    _validate_file(vocab_file)
+  #if bleu_source:
+  #  _validate_file(bleu_source)
+  #if bleu_ref:
+  #  _validate_file(bleu_ref)
 
-  evaluate_bleu = bleu_source is not None and bleu_ref is not None
-  if evaluate_bleu and schedule_manager.use_tpu:
-    raise ValueError("BLEU score can not be computed when training with a TPU, "
-                     "as it requires estimator.predict which is not yet "
-                     "supported.")
+  #evaluate_bleu = bleu_source is not None and bleu_ref is not None
 
   # Print details of training schedule.
   tf.logging.info("Training schedule:")
   tf.logging.info(
       "\t1. Train for {}".format(schedule_manager.train_increment_str))
   tf.logging.info("\t2. Evaluate model.")
-  if evaluate_bleu:
-    tf.logging.info("\t3. Compute BLEU score.")
-    if bleu_threshold is not None:
-      tf.logging.info("Repeat above steps until the BLEU score reaches %f" %
-                      bleu_threshold)
-  if not evaluate_bleu or bleu_threshold is None:
-    tf.logging.info("Repeat above steps %d times." %
-                    schedule_manager.train_eval_iterations)
+  #if evaluate_bleu:
+  #  tf.logging.info("\t3. Compute BLEU score.")
+  #  if bleu_threshold is not None:
+  #    tf.logging.info("Repeat above steps until the BLEU score reaches %f" %
+  #                    bleu_threshold)
+  #if not evaluate_bleu or bleu_threshold is None:
+  #  tf.logging.info("Repeat above steps %d times." %
+  #                  schedule_manager.train_eval_iterations)
 
-  if evaluate_bleu:
-    # Create summary writer to log bleu score (values can be displayed in
-    # Tensorboard).
-    bleu_writer = tf.summary.FileWriter(
-        os.path.join(estimator.model_dir, BLEU_DIR))
-    if bleu_threshold is not None:
-      # Change loop stopping condition if bleu_threshold is defined.
-      schedule_manager.train_eval_iterations = INF
+  #if evaluate_bleu:
+  #  # Create summary writer to log bleu score (values can be displayed in
+  #  # Tensorboard).
+  #  bleu_writer = tf.summary.FileWriter(
+  #      os.path.join(estimator.model_dir, BLEU_DIR))
+  #  if bleu_threshold is not None:
+  #    # Change loop stopping condition if bleu_threshold is defined.
+  #    schedule_manager.train_eval_iterations = INF
 
   # Loop training/evaluation/bleu cycles
   for i in xrange(schedule_manager.train_eval_iterations):
@@ -345,27 +318,27 @@ def run_loop(
     # bleu score must be computed using the estimator.predict() path, which
     # outputs translations that are not based on golden values. The translations
     # are compared to reference file to get the actual bleu score.
-    if evaluate_bleu:
-      uncased_score, cased_score = evaluate_and_log_bleu(
-          estimator, bleu_source, bleu_ref, vocab_file)
-
-      # Write actual bleu scores using summary writer and benchmark logger
-      global_step = get_global_step(estimator)
-      summary = tf.Summary(value=[
-          tf.Summary.Value(tag="bleu/uncased", simple_value=uncased_score),
-          tf.Summary.Value(tag="bleu/cased", simple_value=cased_score),
-      ])
-      bleu_writer.add_summary(summary, global_step)
-      bleu_writer.flush()
-      benchmark_logger.log_metric(
-          "bleu_uncased", uncased_score, global_step=global_step)
-      benchmark_logger.log_metric(
-          "bleu_cased", cased_score, global_step=global_step)
-
-      # Stop training if bleu stopping threshold is met.
-      if model_helpers.past_stop_threshold(bleu_threshold, uncased_score):
-        bleu_writer.close()
-        break
+    # if evaluate_bleu:
+    #   uncased_score, cased_score = evaluate_and_log_bleu(
+    #       estimator, bleu_source, bleu_ref, vocab_file)
+    #
+    #   # Write actual bleu scores using summary writer and benchmark logger
+    #   global_step = get_global_step(estimator)
+    #   summary = tf.Summary(value=[
+    #       tf.Summary.Value(tag="bleu/uncased", simple_value=uncased_score),
+    #       tf.Summary.Value(tag="bleu/cased", simple_value=cased_score),
+    #   ])
+    #   bleu_writer.add_summary(summary, global_step)
+    #   bleu_writer.flush()
+    #   benchmark_logger.log_metric(
+    #       "bleu_uncased", uncased_score, global_step=global_step)
+    #   benchmark_logger.log_metric(
+    #       "bleu_cased", cased_score, global_step=global_step)
+    #
+    #   # Stop training if bleu stopping threshold is met.
+    #   if model_helpers.past_stop_threshold(bleu_threshold, uncased_score):
+    #     bleu_writer.close()
+    #     break
 
 
 def define_transformer_flags():
@@ -382,7 +355,7 @@ def define_transformer_flags():
       all_reduce_alg=True
   )
   flags_core.define_benchmark()
-  flags_core.define_device(tpu=True)
+  flags_core.define_device(tpu=False)
 
   # Set flags from the flags_core module as "key flags" so they're listed when
   # the '-h' flag is used. Without this line, the flags defined above are
@@ -437,14 +410,21 @@ def define_transformer_flags():
           "Use the flag --stop_threshold to stop the script based on the "
           "uncased BLEU score."))
   flags.DEFINE_string(
-      name="vocab_file", short_name="vf", default=None,
+      name="input_vocab_file", short_name="ivf", default=None,
+      help=flags_core.help_wrap(
+          "Path to subtoken vocabulary file. If data_download.py was used to "
+          "download and encode the training data, look in the data_dir to find "
+          "the vocab file."))
+
+  flags.DEFINE_string(
+      name="target_vocab_file", short_name="tvf", default=None,
       help=flags_core.help_wrap(
           "Path to subtoken vocabulary file. If data_download.py was used to "
           "download and encode the training data, look in the data_dir to find "
           "the vocab file."))
 
   flags_core.set_defaults(data_dir="/tmp/translate_ende",
-                          model_dir="/tmp/transformer_model",
+                          model_dir="/tmp/model_ende",
                           batch_size=None,
                           train_epochs=None)
 
@@ -462,24 +442,24 @@ def define_transformer_flags():
     return (flags_dict["bleu_source"] is None) == (
         flags_dict["bleu_ref"] is None)
 
-  @flags.multi_flags_validator(
-      ["bleu_source", "bleu_ref", "vocab_file"],
-      message="--vocab_file must be defined if --bleu_source and --bleu_ref "
-              "are defined.")
-  def _check_bleu_vocab_file(flags_dict):
-    if flags_dict["bleu_source"] and flags_dict["bleu_ref"]:
-      return flags_dict["vocab_file"] is not None
-    return True
+  #@flags.multi_flags_validator(
+  #    ["bleu_source", "bleu_ref", "vocab_file"],
+  #    message="--vocab_file must be defined if --bleu_source and --bleu_ref "
+  #            "are defined.")
+  #def _check_bleu_vocab_file(flags_dict):
+  #  if flags_dict["bleu_source"] and flags_dict["bleu_ref"]:
+  #    return flags_dict["vocab_file"] is not None
+  #  return True
 
-  @flags.multi_flags_validator(
-      ["export_dir", "vocab_file"],
-      message="--vocab_file must be defined if --export_dir is set.")
-  def _check_export_vocab_file(flags_dict):
-    if flags_dict["export_dir"]:
-      return flags_dict["vocab_file"] is not None
-    return True
+  #@flags.multi_flags_validator(
+  #    ["export_dir", "vocab_file"],
+  #    message="--vocab_file must be defined if --export_dir is set.")
+  #def _check_export_vocab_file(flags_dict):
+  #  if flags_dict["export_dir"]:
+  #    return flags_dict["vocab_file"] is not None
+  #  return True
 
-  flags_core.require_cloud_storage(["data_dir", "model_dir", "export_dir"])
+  #flags_core.require_cloud_storage(["data_dir", "model_dir", "export_dir"])
 
 
 def construct_estimator(flags_obj, params, schedule_manager):
@@ -493,39 +473,14 @@ def construct_estimator(flags_obj, params, schedule_manager):
   Returns:
     An estimator object to be used for training and eval.
   """
-  if not params["use_tpu"]:
-    distribution_strategy = distribution_utils.get_distribution_strategy(
-        flags_core.get_num_gpus(flags_obj), flags_obj.all_reduce_alg)
-    return tf.estimator.Estimator(
-        model_fn=model_fn, model_dir=flags_obj.model_dir, params=params,
-        config=tf.estimator.RunConfig(train_distribute=distribution_strategy))
 
-  tpu_cluster_resolver = tf.contrib.cluster_resolver.TPUClusterResolver(
-      tpu=flags_obj.tpu,
-      zone=flags_obj.tpu_zone,
-      project=flags_obj.tpu_gcp_project
-  )
+  distribution_strategy = distribution_utils.get_distribution_strategy(
+      flags_core.get_num_gpus(flags_obj), flags_obj.all_reduce_alg)
 
-  tpu_config = tf.contrib.tpu.TPUConfig(
-      iterations_per_loop=schedule_manager.single_iteration_train_steps,
-      num_shards=flags_obj.num_tpu_shards)
+  return tf.estimator.Estimator(
+      model_fn=model_fn, model_dir=flags_obj.model_dir, params=params,
+      config=tf.estimator.RunConfig(train_distribute=distribution_strategy))
 
-  run_config = tf.contrib.tpu.RunConfig(
-      cluster=tpu_cluster_resolver,
-      model_dir=flags_obj.model_dir,
-      session_config=tf.ConfigProto(
-          allow_soft_placement=True, log_device_placement=True),
-      tpu_config=tpu_config)
-
-  return tf.contrib.tpu.TPUEstimator(
-      model_fn=model_fn,
-      use_tpu=params["use_tpu"] and flags_obj.tpu != tpu_util.LOCAL,
-      train_batch_size=schedule_manager.batch_size,
-      eval_batch_size=schedule_manager.batch_size,
-      params={
-          # TPUEstimator needs to populate batch_size itself due to sharding.
-          key: value for key, value in params.items() if key != "batch_size"},
-      config=run_config)
 
 
 def run_transformer(flags_obj):
@@ -535,7 +490,6 @@ def run_transformer(flags_obj):
     flags_obj: Object containing parsed flag values.
   """
   num_gpus = flags_core.get_num_gpus(flags_obj)
-
   # Add flag-defined parameters to params object
   params = PARAMS_MAP[flags_obj.param_set]
   if num_gpus > 1:
@@ -548,8 +502,9 @@ def run_transformer(flags_obj):
   params["model_dir"] = flags_obj.model_dir
   params["num_parallel_calls"] = flags_obj.num_parallel_calls
 
-  params["tpu"] = flags_obj.tpu
-  params["use_tpu"] = bool(flags_obj.tpu)  # was a tpu specified.
+  #params["tpu"] = flags_obj.tpu
+  params['tpu'] = False
+  params["use_tpu"] = False  # was a tpu specified.
   params["static_batch"] = flags_obj.static_batch or params["use_tpu"]
   params["allow_ffn_pad"] = not params["use_tpu"]
 
@@ -561,9 +516,6 @@ def run_transformer(flags_obj):
       params["default_batch_size_tpu"] if params["use_tpu"]
       else params["default_batch_size"]))
 
-  if not params["use_tpu"]:
-    params["batch_size"] = distribution_utils.per_device_batch_size(
-        params["batch_size"], num_gpus)
 
   schedule_manager = schedule.Manager(
       train_steps=flags_obj.train_steps,
@@ -574,7 +526,7 @@ def run_transformer(flags_obj):
       batch_size=params["batch_size"],
       max_length=params["max_length"],
       use_tpu=params["use_tpu"],
-      num_tpu_shards=flags_obj.num_tpu_shards
+      num_tpu_shards=10
   )
 
   params["repeat_dataset"] = schedule_manager.repeat_dataset
@@ -605,12 +557,12 @@ def run_transformer(flags_obj):
       train_hooks=train_hooks,
       benchmark_logger=benchmark_logger,
       # BLEU calculation arguments
-      bleu_source=flags_obj.bleu_source,
-      bleu_ref=flags_obj.bleu_ref,
-      bleu_threshold=flags_obj.stop_threshold,
-      vocab_file=flags_obj.vocab_file)
+      #bleu_source=flags_obj.bleu_source,
+      #bleu_ref=flags_obj.bleu_ref,
+      #bleu_threshold=flags_obj.stop_threshold
+  )
 
-  if flags_obj.export_dir and not params["use_tpu"]:
+  if flags_obj.export_dir :
     serving_input_fn = export.build_tensor_serving_input_receiver_fn(
         shape=[None], dtype=tf.int64, batch_size=None)
     # Export saved model, and save the vocab file as an extra asset. The vocab
@@ -621,7 +573,7 @@ def run_transformer(flags_obj):
     # an extra asset rather than a core asset.
     estimator.export_savedmodel(
         flags_obj.export_dir, serving_input_fn,
-        assets_extra={"vocab.txt": flags_obj.vocab_file})
+        assets_extra={"inputs_vocab.txt": flags_obj.input_vocab_file, 'targets_vocab.txt': flags_obj.target_vocab_file})
 
 
 def main(_):

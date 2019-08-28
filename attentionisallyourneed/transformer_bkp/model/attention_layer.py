@@ -126,11 +126,15 @@ class Attention(tf.layers.Layer):
     q *= depth ** -0.5
 
     # Calculate dot product attention
+    # q: [batch_size, num_heads, lengths, lenghts/ num_heads]
+    # k: [batch_size, num_heads, lengths/num_num_heads, lenghts]
     logits = tf.matmul(q, k, transpose_b=True)
     logits += bias
     weights = tf.nn.softmax(logits, name="attention_weights")
     if self.train:
       weights = tf.nn.dropout(weights, 1.0 - self.attention_dropout)
+    #v --- > [batch_size, num_heads, hidden_size, hidden_size/num_heads]
+    # weight ----> [batch_size, num_headas,
     attention_output = tf.matmul(weights, v)
 
     # Recombine heads --> [batch_size, length, hidden_size]

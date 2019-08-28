@@ -26,8 +26,6 @@ from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
 
-from official.transformer.utils import tokenizer
-from official.utils.flags import core as flags_core
 
 _DECODE_BATCH_SIZE = 32
 _EXTRA_DECODE_LENGTH = 100
@@ -63,20 +61,20 @@ def _get_sorted_inputs(filename):
 
 def _encode_and_add_eos(line, subtokenizer):
   """Encode line with subtokenizer, and add EOS id to the end."""
-  return subtokenizer.encode(line) + [tokenizer.EOS_ID]
+  return subtokenizer.encode(line) + [textencoder.EOS_ID]
 
 
 def _trim_and_decode(ids, subtokenizer):
   """Trim EOS and PAD tokens from ids, and decode to return a string."""
   try:
-    index = list(ids).index(tokenizer.EOS_ID)
+    index = list(ids).index(textencoder.EOS_ID)
     return subtokenizer.decode(ids[:index])
   except ValueError:  # No EOS found in sequence
     return subtokenizer.decode(ids)
 
 
 def translate_file(
-    estimator, subtokenizer, input_file, output_file=None,
+    estimator, input_encoder, target_encoder, input_file, output_file=None,
     print_all_translations=True):
   """Translate lines in file, and save to output file if specified.
 
@@ -106,7 +104,7 @@ def translate_file(
 
         tf.logging.info("Decoding batch %d out of %d." %
                         (batch_num, num_decode_batches))
-      yield _encode_and_add_eos(line, subtokenizer)
+      yield _encode_and_add_eos(line, input_encoder)
 
   def input_fn():
     """Created batched dataset of encoded inputs."""
@@ -117,7 +115,7 @@ def translate_file(
 
   translations = []
   for i, prediction in enumerate(estimator.predict(input_fn)):
-    translation = _trim_and_decode(prediction["outputs"], subtokenizer)
+    translation = _trim_and_decode(prediction["outputs"], target_encoder)
     translations.append(translation)
 
     if print_all_translations:
@@ -135,9 +133,9 @@ def translate_file(
         f.write("%s\n" % translations[i])
 
 
-def translate_text(estimator, subtokenizer, txt):
+def translate_text(estimator, input_encoder, target_encoder, txt):
   """Translate a single string."""
-  encoded_txt = _encode_and_add_eos(txt, subtokenizer)
+  encoded_txt = _encode_and_add_eos(txt, input_encoder)
 
   def input_fn():
     ds = tf.data.Dataset.from_tensors(encoded_txt)
@@ -146,12 +144,13 @@ def translate_text(estimator, subtokenizer, txt):
 
   predictions = estimator.predict(input_fn)
   translation = next(predictions)["outputs"]
-  translation = _trim_and_decode(translation, subtokenizer)
+  translation = _trim_and_decode(translation, target_encoder)
   tf.logging.info("Translation of \"%s\": \"%s\"" % (txt, translation))
 
-
+from transformer import textencoder
+from transformer.utils import tokenizer
 def main(unused_argv):
-  from official.transformer import transformer_main
+  from transformer import transformer_main
 
   tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -160,7 +159,8 @@ def main(unused_argv):
                     "flags --text or --file.")
     return
 
-  subtokenizer = tokenizer.Subtokenizer(FLAGS.vocab_file)
+  input_encoder = tokenizer.Subtokenizer(FLAGS.input_vocab_file)
+  target_encoder = tokenizer.Subtokenizer(FLAGS.target_vocab_file)
 
   # Set up estimator and params
   params = transformer_main.PARAMS_MAP[FLAGS.param_set]
@@ -174,7 +174,7 @@ def main(unused_argv):
 
   if FLAGS.text is not None:
     tf.logging.info("Translating text: %s" % FLAGS.text)
-    translate_text(estimator, subtokenizer, FLAGS.text)
+    translate_text(estimator, input_encoder, target_encoder, FLAGS.text)
 
   if FLAGS.file is not None:
     input_file = os.path.abspath(FLAGS.file)
@@ -187,47 +187,51 @@ def main(unused_argv):
       output_file = os.path.abspath(FLAGS.file_out)
       tf.logging.info("File output specified: %s" % output_file)
 
-    translate_file(estimator, subtokenizer, input_file, output_file)
+    translate_file(estimator, input_encoder, target_encoder, input_file, output_file)
 
 
 def define_translate_flags():
   """Define flags used for translation script."""
   # Model flags
   flags.DEFINE_string(
-      name="model_dir", short_name="md", default="/tmp/transformer_model",
-      help=flags_core.help_wrap(
-          "Directory containing Transformer model checkpoints."))
+      name="model_dir", short_name="md", default="/home/zhengwu/data/zhengwu_workspace/translate/model_subword_4096_base",
+      help="Directory containing Transformer model checkpoints.")
   flags.DEFINE_enum(
-      name="param_set", short_name="mp", default="big",
-      enum_values=["base", "big"],
-      help=flags_core.help_wrap(
-          "Parameter set to use when creating and training the model. The "
+      name="param_set", short_name="mp", default="base",
+      enum_values=["base", "big", "tiny"],
+      help="Parameter set to use when creating and training the model. The "
           "parameters define the input shape (batch size and max length), "
           "model configuration (size of embedding, # of hidden layers, etc.), "
           "and various other settings. The big parameter set increases the "
           "default batch size, embedding/hidden size, and filter size. For a "
-          "complete list of parameters, please see model/model_params.py."))
-  flags.DEFINE_string(
-      name="vocab_file", short_name="vf", default=None,
-      help=flags_core.help_wrap(
-          "Path to subtoken vocabulary file. If data_download.py was used to "
-          "download and encode the training data, look in the data_dir to find "
-          "the vocab file."))
-  flags.mark_flag_as_required("vocab_file")
+          "complete list of parameters, please see model/model_params.py.")
 
   flags.DEFINE_string(
-      name="text", default=None,
-      help=flags_core.help_wrap(
-          "Text to translate. Output will be printed to console."))
+      name="input_vocab_file", short_name="ivf", default="/home/zhengwu/data/zhengwu_workspace/translate/source_data/lang1_sub_word.vocab",
+      help="Path to subtoken vocabulary file. If data_download.py was used to "
+          "download and encode the training data, look in the data_dir to find "
+          "the vocab file.")
+
   flags.DEFINE_string(
-      name="file", default=None,
-      help=flags_core.help_wrap(
-          "File containing text to translate. Translation will be printed to "
-          "console and, if --file_out is provided, saved to an output file."))
+      name="target_vocab_file", short_name="tvf", default="/home/zhengwu/data/zhengwu_workspace/translate/source_data/lang2_sub_word.vocab",
+      help="Path to subtoken vocabulary file. If data_download.py was used to "
+           "download and encode the training data, look in the data_dir to find "
+           "the vocab file.")
+
+  flags.mark_flag_as_required("input_vocab_file")
+  flags.mark_flag_as_required("target_vocab_file")
+
   flags.DEFINE_string(
-      name="file_out", default=None,
-      help=flags_core.help_wrap(
-          "If --file flag is specified, save translation to this file."))
+      name="text", default="",
+      help="Text to translate. Output will be printed to console.")
+
+  flags.DEFINE_string(
+      name="file", default="/home/zhengwu/data/zhengwu_workspace/translate/source_data/dev.lang1",
+      help="File containing text to translate. Translation will be printed to "
+          "console and, if --file_out is provided, saved to an output file.")
+  flags.DEFINE_string(
+      name="file_out", default='test.txt',
+      help="If --file flag is specified, save translation to this file.")
 
 
 if __name__ == "__main__":

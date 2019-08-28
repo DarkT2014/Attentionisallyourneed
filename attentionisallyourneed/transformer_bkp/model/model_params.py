@@ -21,13 +21,14 @@ BASE_PARAMS = defaultdict(
     lambda: None,  # Set default value to None.
 
     # Input params
-    default_batch_size=2048,  # Maximum number of tokens per batch of examples.
-    default_batch_size_tpu=32768,
+    default_batch_size=4096,  # Maximum number of tokens per batch of examples.
+    # default_batch_size_tpu=32768,
     max_length=256,  # Maximum number of tokens per example.
 
     # Model params
     initializer_gain=1.0,  # Used in trainable variable initialization.
-    vocab_size=33708,  # Number of tokens defined in the vocabulary file.
+    inputs_vocab_size=33317,  # Number of tokens defined in the vocabulary file.
+    targets_vocab_size=32601,
     hidden_size=512,  # Model dimension in the hidden layers.
     num_hidden_layers=6,  # Number of layers in the encoder and decoder stacks.
     num_heads=8,  # Number of heads to use in multi-headed attention.

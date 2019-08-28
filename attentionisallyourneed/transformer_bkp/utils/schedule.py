@@ -71,8 +71,6 @@ class Manager(object):
     self.use_tpu = use_tpu
     self.num_tpu_shards = num_tpu_shards
 
-    if self.use_tpu:
-      assert (self.batch_size // self.max_length) % self.num_tpu_shards == 0
 
   @property
   def single_iteration_train_steps(self):
