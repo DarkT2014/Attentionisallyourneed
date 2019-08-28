@@ -8,7 +8,7 @@ MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
 INPUT_VOCAB=$DATA_DIR/en_sub_word.vocab
 TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
 
-cd ../models
+cd {$PWD}/../models
 export PYTHONPATH="$PYTHONPATH:{$PWD}"
 pip install --user -r official/requirements.txt
 
