@@ -221,7 +221,7 @@ def _read_and_batch_from_files(
   print('-------------------------------')
   print("~~~~~~~~~~~~~~~~~~~file pattern is : " + file_pattern)#byme
   dataset = tf.data.Dataset.list_files(file_pattern, shuffle=shuffle)
-  print(dataset.size())
+  print(dataset)
   # Read files and interleave results. When training, the order of the examples
   # will be non-deterministic.
   dataset = dataset.apply(
