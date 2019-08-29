@@ -174,7 +174,8 @@ cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.en ${OUTPUT_DIR}
 
 
 
-python transformer/process_data2.py
+# python transformer/process_data2.py
+python transformer/process_data3.py
 
 # # Generate Subword Units (BPE)
 # # Clone Subword NMT
