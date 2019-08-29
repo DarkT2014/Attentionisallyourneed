@@ -137,7 +137,7 @@ def all_exist(filepaths):
 
 
 def txt_line_iterator(path):
-"""Iterate through lines of file."""
+    """Iterate through lines of file."""
     with tf.gfile.Open(path) as f:
         for line in f:
             yield line.strip()
@@ -282,7 +282,7 @@ if __name__ == '__main__':
     # _save_vocab_file(zh_vocab, zh_subtoken_list)
     _save_vocab_file(vocab_file, zh_subtoken_list)
 
-    
+
     print("Tokenizing zh vocab done.")
 
 
