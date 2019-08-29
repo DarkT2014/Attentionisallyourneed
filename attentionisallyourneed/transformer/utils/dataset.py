@@ -218,6 +218,7 @@ def _read_and_batch_from_files(
   Returns:
     tf.data.Dataset object containing examples loaded from the files.
   """
+  print('-------------------------------')
   print("file pattern is : " + file_pattern)#byme
   dataset = tf.data.Dataset.list_files(file_pattern, shuffle=shuffle)
 
@@ -265,6 +266,8 @@ def _generate_synthetic_data(params):
 def train_input_fn(params):
   """Load and return dataset of batched examples for use during training."""
   file_pattern = os.path.join(params["data_dir"] or "", "*train*")
+  print(">>>>>>>>>>>>>>>>>>file_pattern is : " + file_pattern)
+  print("delete this zhushi in dataset.py:270")
   if params["use_synthetic_data"]:
     return _generate_synthetic_data(params)
   return _read_and_batch_from_files(
