@@ -137,8 +137,9 @@ if __name__ == '__main__':
         start_time = time.time()
         # jieba.enable_parallel(4)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-
-        jieba.load_userdict(os.path.join(dir_path, 'mydict.txt'))
+        dict_path = os.path.join(dir_path, 'mydict.txt')
+        print("path of user dict of jieba is : " + dict_path)
+        jieba.load_userdict(dict_path)
         last_time = time.time()
         for i, line in iterator_file(zh_source_file):
             line = line.replace("\r","").replace("\n","")
