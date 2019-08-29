@@ -105,6 +105,7 @@ if __name__ == '__main__':
     print("create vocab ...")
 
 
+
     en_source_file = os.path.join(source_dir, _TRAIN_DATA['inputs'])
     zh_source_file = os.path.join(source_dir, _TRAIN_DATA['targets'])
 
