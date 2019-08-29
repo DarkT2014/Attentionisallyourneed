@@ -218,6 +218,7 @@ def _read_and_batch_from_files(
   Returns:
     tf.data.Dataset object containing examples loaded from the files.
   """
+  print("file pattern is : " + file_pattern)#byme
   dataset = tf.data.Dataset.list_files(file_pattern, shuffle=shuffle)
 
   # Read files and interleave results. When training, the order of the examples
