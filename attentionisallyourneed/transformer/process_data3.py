@@ -285,7 +285,7 @@ if __name__ == '__main__':
         print("reading existed zh vocab file ...")
         with io.open(zh_vocab, encoding='utf8') as f:
             for line in f:
-                zh_subtoken_list.append(line.strip("'").strip('\n'))
+                zh_subtoken_list.append(line.replace("'","").strip('\n'))
         print("done.")
     
     print("--------------------------------")
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     with io.open(en_vocab, encoding='utf8') as f:
         for line in f:
             if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
-                subtoken_list.append(line.strip("'").strip('\n'))
+                subtoken_list.append(line.replace("'","").strip('\n'))
 
 
     print(subtoken_list[:10])
