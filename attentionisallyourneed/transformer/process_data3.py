@@ -228,8 +228,8 @@ if __name__ == '__main__':
 
 
     ##### create vocab
-    zh_vocab = os.path.join(source_dir, "zh_sub_word.vocab")
-    en_vocab = os.path.join(source_dir, "en_sub_word.vocab")
+    zh_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.zh")
+    en_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.en")
     print("create vocab ...")
 
 
@@ -311,8 +311,9 @@ if __name__ == '__main__':
     #     zh_vocab, [zh_source_file],  2**15, 20,
     #     min_count=None, file_byte_limit=1e9)
     print("Saving zh vocab files ...")
-    # _save_vocab_file(zh_vocab, zh_subtoken_list)
+    _save_vocab_file(zh_vocab, zh_subtoken_list)
 
+    print("Saving vocab file ...")
     
     _save_vocab_file(vocab_file, subtoken_list)
 
