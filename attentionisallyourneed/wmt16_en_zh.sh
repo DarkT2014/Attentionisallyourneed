@@ -178,13 +178,18 @@ echo "Please Select:
 1.run process_data2.py
 2.run process_data3.py"
 read -p "Enter selection [1 or 2] >" num
-if [[ $num =~ ^[1-2]$ ]]; then
+if [[ $num =~ ^[0-2]$ ]]; then
   if [[ $num == 1 ]]; then
     python transformer/process_data2.py
   fi
   if [[ $num == 2 ]]; then
     python transformer/process_data3.py
   fi
+  if [[ $num == 0 ]]; then
+    echo "do nothing, exit."
+    exit;
+  fi
+
 else
  echo "Invalid entry." >&2
  exit 1
