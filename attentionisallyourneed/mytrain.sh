@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-DATA_DIR=/tmp/t2t_datagen/
-PARAM_SET=base
-MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
+DATA_DIR="/tmp/t2t_datagen/"
+PARAM_SET="base"
+MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
 
 # SOURCE_DIR=./test_data/source_data
-INPUT_VOCAB=$DATA_DIR/en_sub_word.vocab
-TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
+INPUT_VOCAB="$DATA_DIR/en_sub_word.vocab"
+TARGET_VOCAB="$DATA_DIR/zh_sub_word.vocab"
 
 
 # export PYTHONPATH="$PYTHONPATH:${PWD}/models"

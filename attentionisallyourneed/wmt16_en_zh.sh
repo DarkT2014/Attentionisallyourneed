@@ -22,8 +22,10 @@ BASE_DIR="seq2seq/"
 # OUTPUT_DIR=${OUTPUT_DIR:-$HOME/nmt_data/wmt16_zh_en}
 # echo "Writing to ${OUTPUT_DIR}. To change this, set the OUTPUT_DIR environment variable."
 
-OUTPUT_DIR="/tmp/t2t_datagen"
-OUTPUT_DIR_DATA="${OUTPUT_DIR}/data"
+# OUTPUT_DIR="/tmp/t2t_datagen"
+
+OUTPUT_DIR="/root/train_data"
+OUTPUT_DIR_DATA="/tmp/t2t_datagen/data"
 
 mkdir -p $OUTPUT_DIR_DATA
 
