@@ -246,7 +246,7 @@ def _validate_file(filepath):
     exist = os.path.exists(filepath)
     
     tf.logging.info(exist)
-    tf.logging.info(filepath == "/tmp/t2t_datagen/enzh.vocab")
+    tf.logging.info(filepath.strip(" ") == "/tmp/t2t_datagen/enzh.vocab")
     tf.logging.info(type(filepath))
     # tf.logging.info(os.path.exists("/tmp/t2t_datagen"))
     # tf.logging.info(os.path.exists("/tmp/t2t_datagen/enzh.vocab"))
