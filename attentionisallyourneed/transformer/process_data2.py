@@ -100,8 +100,8 @@ if __name__ == '__main__':
 
 
     ##### create vocab
-    zh_vocab = os.path.join(source_dir, "zh_sub_word.vocab")
-    en_vocab = os.path.join(source_dir, "en_sub_word.vocab")
+    zh_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.zh")
+    en_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.en")
     print("create vocab ...")
 
 

@@ -174,10 +174,23 @@ cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.en ${OUTPUT_DIR}
 #   < ${OUTPUT_DIR}/train.tok.clean.zh \
 #   > ${OUTPUT_DIR}/vocab.50k.zh \
 
-
-
-# python transformer/process_data2.py
-python transformer/process_data3.py
+echo "Please Select:
+1.run process_data2.py
+2.run process_data3.py"
+read -p "Enter selection [1 or 2] >" num
+if [[ $num =~ ^[1-2]$ ]]; then
+  if [[ $num == 1 ]]; then
+    python transformer/process_data2.py
+  fi
+  if [[ $num == 2 ]]; then
+    python transformer/process_data3.py
+  fi
+else
+ echo "Invalid entry." >&2
+ exit 1
+fi
+python transformer/process_data2.py
+# python transformer/process_data3.py
 
 # # Generate Subword Units (BPE)
 # # Clone Subword NMT
