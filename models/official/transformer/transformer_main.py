@@ -295,6 +295,8 @@ def run_loop(
       single_iteration_train_epochs were defined.
     NotFoundError: if the vocab file or bleu files don't exist.
   """
+  vocab_file = vocab_file.strip()#byme
+
   if bleu_source:
     _validate_file(bleu_source)
   if bleu_ref:
