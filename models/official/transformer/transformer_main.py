@@ -240,7 +240,9 @@ def evaluate_and_log_bleu(estimator, bleu_source, bleu_ref, vocab_file):
 def _validate_file(filepath):
   """Make sure that file exists."""
   if not tf.gfile.Exists(filepath):
+    tf.logging.info("-----------------------------")
     tf.logging.info("the file path --" + filepath + "is not exist, pls check it.")#byme
+    tf.logging.info("-----------------------------")
     raise tf.errors.NotFoundError(None, None, "File %s not found." % filepath)
 
 
