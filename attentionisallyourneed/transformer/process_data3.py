@@ -10,7 +10,7 @@ sys.path.append(_package_path)
 
 import tensorflow as tf
 import jieba
-from utils.tokenizer import _save_vocab_file
+from utils.tokenizer import _save_vocab_file, _load_vocab_file
 import random
 
 
