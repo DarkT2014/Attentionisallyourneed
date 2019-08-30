@@ -339,6 +339,10 @@ def run_loop(
 
     # Train the model for single_iteration_train_steps or until the input fn
     # runs out of examples (if single_iteration_train_steps is None).
+    tf.logging.info("-------------------")
+    tf.logging.info(train_hooks)
+    tf.logging.info(type(train_hooks))
+    tf.logging.info("-------------------")
     estimator.train(
         dataset.train_input_fn,
         steps=schedule_manager.single_iteration_train_steps,
