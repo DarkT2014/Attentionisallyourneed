@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DATA_DIR=/tmp/t2t_datagen/
+DATA_DIR=/tmp/t2t_datagen
 PARAM_SET=base
 MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
 
@@ -8,8 +8,8 @@ MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
 INPUT_VOCAB=$DATA_DIR/en_sub_word.vocab
 TARGET_VOCAB=$DATA_DIR/zh_sub_word.vocab
 
-
-export PYTHONPATH="$PWD/models"
+echo $PYTHONPATH
+export PYTHONPATH="$PYTHONPATH:$PWD/models"
 
 echo $PYTHONPATH
 pip install --user -r models/official/requirements.txt
