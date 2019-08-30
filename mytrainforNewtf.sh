@@ -20,6 +20,7 @@ pip install --user -r models/official/requirements.txt
 #     "${DATA_DIR}/zh_sub_word.vocab" \
 #   > "${DATA_DIR}/enzhfornewtf.vocab"
 VOCAB_FILE=$DATA_DIR/enzh.vocab
+echo "\n The vocab file path is \n"
 echo $VOCAB_FILE
 
 python models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --vocab_file $VOCAB_FILE
