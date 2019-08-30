@@ -297,6 +297,9 @@ if __name__ == '__main__':
             if line is not '<pad>' and line is not '<EOS>':
                 subtoken_list.append(line)
 
+
+    print(subtoken_list[:10])
+    
     subtoken_list = subtoken_list + zh_subtoken_list
     vocab_file = os.path.join(DATA_DIR, "enzh.vocab")
     print("Tokenizinig zh vocab ...")
