@@ -1,6 +1,6 @@
 PROBLEM=translate_enzh_wmt32k
 MODEL=transformer
-HPARAMS=transformer_base_single_gpu
+HPARAMS=transformer_base
 
 DATA_DIR=/tmp/t2t_datagen
 TRAIN_DIR=$HOME/t2t_train/$PROBLEM/$MODEL-$HPARAMS
