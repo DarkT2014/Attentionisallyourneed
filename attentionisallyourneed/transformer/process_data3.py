@@ -42,7 +42,7 @@ def iterator_file(file_path):
             yield i,line
 
 
-_PREFIX = "translate"
+_PREFIX = "translate_enzh_wmt32k"
 
 def shard_filename(path, tag, shard_num, total_shards):
     """Create filename for data shard."""
@@ -312,6 +312,8 @@ if __name__ == '__main__':
     #     min_count=None, file_byte_limit=1e9)
     print("Saving zh vocab files ...")
     # _save_vocab_file(zh_vocab, zh_subtoken_list)
+
+    
     _save_vocab_file(vocab_file, subtoken_list)
 
 
