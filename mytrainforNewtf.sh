@@ -5,17 +5,15 @@ PARAM_SET="base"
 MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
 
 # SOURCE_DIR=./test_data/source_data
-INPUT_VOCAB="$DATA_DIR/en_sub_word.vocab"
-TARGET_VOCAB="$DATA_DIR/zh_sub_word.vocab"
-
+# INPUT_VOCAB="$DATA_DIR/en_sub_word.vocab"
+# TARGET_VOCAB="$DATA_DIR/zh_sub_word.vocab"
+echo "Pythonpath is :"
 echo $PYTHONPATH
 export PYTHONPATH="$PYTHONPATH:$PWD/models"
 
 echo $PYTHONPATH
 pip install --user -r models/official/requirements.txt
 # export PYTHONPATH="$PYTHONPATH:${PWD}/models"
-
-
 # cat "${DATA_DIR}/en_sub_word.vocab" \
 #     "${DATA_DIR}/zh_sub_word.vocab" \
 #   > "${DATA_DIR}/enzhfornewtf.vocab"
