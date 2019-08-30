@@ -242,9 +242,11 @@ if __name__ == '__main__':
         en_vocab, [en_source_file],  2**15, 20,
         min_count=None, file_byte_limit=1e8)
     print("en tokenize done.")
-    # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
-    #     zh_vocab, [zh_source_file],  2**15, 20,
-    #     min_count=None, file_byte_limit=1e8)
+    
+
+
+
+
     zh_subtoken_list = []
     doIt = True
     if os.path.exists(zh_vocab):
@@ -292,10 +294,11 @@ if __name__ == '__main__':
     
 
     subtoken_list = []
-    with io.open(en_vocab, encoding='utf8') as f:
-        for line in f:
-            if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
-                subtoken_list.append(line.replace("'","").strip('\n'))
+    # with io.open(en_vocab, encoding='utf8') as f:
+    #     for line in f:
+    #         if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
+    #             subtoken_list.append(line.replace("'","").strip('\n'))
+    subtoken_list = _load_vocab_file(en_vocab)
 
 
     print(subtoken_list[:10])
