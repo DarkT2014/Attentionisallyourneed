@@ -285,7 +285,7 @@ if __name__ == '__main__':
         print("reading existed zh vocab file ...")
         with io.open(zh_vocab, encoding='utf8') as f:
             for line in f:
-                zh_subtoken_list.append(line)
+                zh_subtoken_list.append(line.strip("'").strip('\n'))
         print("done.")
     
     print("--------------------------------")
