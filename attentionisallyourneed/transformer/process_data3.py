@@ -299,8 +299,9 @@ if __name__ == '__main__':
 
 
     print(subtoken_list[:10])
-    
+
     subtoken_list = subtoken_list + zh_subtoken_list
+    
     vocab_file = os.path.join(DATA_DIR, "enzh.vocab")
     print("Tokenizinig zh vocab ...")
     # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
@@ -308,7 +309,7 @@ if __name__ == '__main__':
     #     min_count=None, file_byte_limit=1e9)
     print("Saving zh vocab files ...")
     # _save_vocab_file(zh_vocab, zh_subtoken_list)
-    _save_vocab_file(vocab_file, zh_subtoken_list)
+    _save_vocab_file(vocab_file, subtoken_list)
 
 
     print("Tokenizing zh vocab done.")
