@@ -179,6 +179,7 @@ echo "Please Select:
 2.run process_data3.py"
 read -p "Enter selection [1 or 2] >" num
 if [[ $num =~ ^[0-2]$ ]]; then
+
   if [[ $num == 1 ]]; then
     python transformer/process_data2.py
   fi
