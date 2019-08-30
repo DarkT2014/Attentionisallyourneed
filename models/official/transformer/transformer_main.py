@@ -241,7 +241,8 @@ def _validate_file(filepath):
   """Make sure that file exists."""
   if not tf.gfile.Exists(filepath):
     tf.logging.info("-----------------------------")
-    tf.logging.info("the file path --" + filepath + "is not exist, pls check it.")#byme
+    tf.logging.info(filepath)#byme
+    tf.logging.info("/tmp/t2t_datagen/enzh.vocab")
     exist = os.path.exists(filepath)
     
     tf.logging.info(exist)
