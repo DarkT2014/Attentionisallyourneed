@@ -34,7 +34,7 @@ _TRAIN_SHARDS = 100
 _EVAL_SHARDS = 1
 
 RAW_DIR = "/tmp/t2t_datagen/"
-DATA_DIR = "/root/train_data"
+DATA_DIR = "/tmp/t2t_datagen/"
 
 def iterator_file(file_path):
     with io.open(file_path, encoding='utf-8') as inf:
@@ -224,18 +224,18 @@ def encode_and_save_files(
 if __name__ == '__main__':
 
     # source_dir = "./test_data"
-    # source_dir = DATA_DIR
+    source_dir = "/tmp/t2t_datagen"
 
 
     ##### create vocab
-    zh_vocab = os.path.join(DATA_DIR, "zh_sub_word.vocab")
-    en_vocab = os.path.join(DATA_DIR, "en_sub_word.vocab")
+    zh_vocab = os.path.join(source_dir, "zh_sub_word.vocab")
+    en_vocab = os.path.join(source_dir, "en_sub_word.vocab")
     print("create vocab ...")
 
 
 
-    en_source_file = os.path.join(DATA_DIR, _TRAIN_DATA['inputs'])
-    zh_source_file = os.path.join(DATA_DIR, _TRAIN_DATA['targets'])
+    en_source_file = os.path.join(source_dir, _TRAIN_DATA['inputs'])
+    zh_source_file = os.path.join(source_dir, _TRAIN_DATA['targets'])
 
 
     inputs_tokenizer = tokenizer.Subtokenizer.init_from_files(
