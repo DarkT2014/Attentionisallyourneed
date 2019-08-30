@@ -11,7 +11,7 @@ sys.path.append(_package_path)
 import tensorflow as tf
 import jieba
 from utils.tokenizer import _save_vocab_file
-
+import random
 
 
 MIN_COUNT = 5
@@ -143,6 +143,31 @@ def txt_line_iterator(path):
             yield line.strip()
 
 
+def shuffle_records(fname):
+  """Shuffle records in a single file."""
+  tf.logging.info("Shuffling records in file %s" % fname)
+
+  # Rename file prior to shuffling
+  tmp_fname = fname + ".unshuffled"
+  tf.gfile.Rename(fname, tmp_fname)
+
+  reader = tf.python_io.tf_record_iterator(tmp_fname)
+  records = []
+  for record in reader:
+    records.append(record)
+    if len(records) % 100000 == 0:
+      tf.logging.info("\tRead: %d", len(records))
+
+  random.shuffle(records)
+
+  # Write shuffled records to original file name
+  with tf.python_io.TFRecordWriter(fname) as w:
+    for count, record in enumerate(records):
+      w.write(record)
+      if count > 0 and count % 100000 == 0:
+        tf.logging.info("\tWriting record: %d" % count)
+
+  tf.gfile.Remove(tmp_fname)
 
 def encode_and_save_files(
     subtokenizer, data_dir, raw_files, tag, total_shards):
