@@ -189,7 +189,7 @@ else
  echo "Invalid entry." >&2
  exit 1
 fi
-python transformer/process_data2.py
+# python transformer/process_data2.py
 # python transformer/process_data3.py
 
 # # Generate Subword Units (BPE)
