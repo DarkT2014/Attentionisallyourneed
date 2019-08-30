@@ -294,12 +294,12 @@ if __name__ == '__main__':
     subtoken_list = []
     with io.open(en_vocab, encoding='utf8') as f:
         for line in f:
-            if line is not '<pad>' and line is not '<EOS>':
+            if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
                 subtoken_list.append(line)
 
 
     print(subtoken_list[:10])
-
+    print(zh_subtoken_list[:10])
     subtoken_list = subtoken_list + zh_subtoken_list
     
     vocab_file = os.path.join(DATA_DIR, "enzh.vocab")
@@ -310,6 +310,7 @@ if __name__ == '__main__':
     print("Saving zh vocab files ...")
     # _save_vocab_file(zh_vocab, zh_subtoken_list)
     _save_vocab_file(vocab_file, subtoken_list)
+
 
 
     print("Tokenizing zh vocab done.")
