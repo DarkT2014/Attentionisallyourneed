@@ -339,7 +339,7 @@ def run_loop(
 
     # Train the model for single_iteration_train_steps or until the input fn
     # runs out of examples (if single_iteration_train_steps is None).
-    tf.logging.info("-------------------")
+    tf.logging.info("-------------------")#byme
     tf.logging.info(train_hooks)
     tf.logging.info(type(train_hooks))
     tf.logging.info("-------------------")
@@ -561,8 +561,10 @@ def run_transformer(flags_obj):
     elif flags_obj.param_set == "base":
       params = model_params.BASE_MULTI_GPU_PARAMS
 
-  params["data_dir"] = flags_obj.data_dir
-  params["model_dir"] = flags_obj.model_dir
+  # params["data_dir"] = flags_obj.data_dir
+  # params["model_dir"] = flags_obj.model_dir
+  params["data_dir"] = flags_obj.data_dir.strip()#byme
+  params["model_dir"] = flags_obj.model_dir.strip()
   params["num_parallel_calls"] = flags_obj.num_parallel_calls
 
   params["tpu"] = flags_obj.tpu
@@ -601,7 +603,8 @@ def run_transformer(flags_obj):
   # Create hooks that log information about the training and metric values
   train_hooks = hooks_helper.get_train_hooks(
       flags_obj.hooks,
-      model_dir=flags_obj.model_dir,
+      # model_dir=flags_obj.model_dir,
+      model_dir=flags_obj.model_dir.strip(),#byme
       tensors_to_log=TENSORS_TO_LOG,  # used for logging hooks
       batch_size=schedule_manager.batch_size,  # for ExamplesPerSecondHook
       use_tpu=params["use_tpu"]  # Not all hooks can run with TPUs
