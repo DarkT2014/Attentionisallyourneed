@@ -295,7 +295,7 @@ if __name__ == '__main__':
     with io.open(en_vocab, encoding='utf8') as f:
         for line in f:
             if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
-                subtoken_list.append(line)
+                subtoken_list.append(line.strip("'").strip('\n'))
 
 
     print(subtoken_list[:10])
