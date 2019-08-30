@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-DATA_DIR=/tmp/t2t_datagen
+# DATA_DIR=/tmp/t2t_datagen
+DATA_DIR=/root/train_data
 PARAM_SET=base
 MODEL_DIR=model_dir/model_subword_4096_$PARAM_SET
 
@@ -20,7 +21,7 @@ pip install --user -r models/official/requirements.txt
 #     "${DATA_DIR}/zh_sub_word.vocab" \
 #   > "${DATA_DIR}/enzhfornewtf.vocab"
 # VOCAB_FILE=$DATA_DIR/enzh.vocab
-VOCAB_FILE=/tmp/t2t_datagen/enzh.vocab
+VOCAB_FILE=/root/train_data/enzh.vocab
 echo "\n The vocab file path is \n"
 echo $VOCAB_FILE
 
