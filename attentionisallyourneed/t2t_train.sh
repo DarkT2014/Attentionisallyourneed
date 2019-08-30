@@ -1,4 +1,4 @@
-PROBLEM=translate_ende_wmt32k
+PROBLEM=translate_enzh_wmt32k
 MODEL=transformer
 HPARAMS=transformer_base_single_gpu
 
