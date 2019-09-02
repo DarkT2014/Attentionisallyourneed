@@ -3,6 +3,7 @@
 DATA_DIR="/tmp/t2t_datagen/"
 PARAM_SET="base"
 MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
+PARAM_BATCH="batch_size=1024"
 
 # SOURCE_DIR=./test_data/source_data
 INPUT_VOCAB="$DATA_DIR/vocab.translate_enzh_wmt32k.32768.subwords.en"
@@ -18,7 +19,7 @@ TARGET_VOCAB="$DATA_DIR/vocab.translate_enzh_wmt32k.32768.subwords.zh"
 #   > "${DATA_DIR}/enzhfornewtf.vocab"
 # VOCAB_FILE=$DATA_DIR/enzhfornewtf.vocab
 
-python transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --input_vocab_file $INPUT_VOCAB --target_vocab_file $TARGET_VOCAB
+python transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --input_vocab_file=$INPUT_VOCAB --target_vocab_file=$TARGET_VOCAB --hparams_set=$PARAM_BATCH
     
 
     # --param_set=$PARAM_SET
