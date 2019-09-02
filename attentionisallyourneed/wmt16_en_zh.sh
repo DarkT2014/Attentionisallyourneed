@@ -30,7 +30,7 @@ OUTPUT_DIR_DATA="${OUTPUT_DIR}/data"
 mkdir -p $OUTPUT_DIR_DATA
 
 echo "Downloading cwmt file . This may take a while ..."
-wget -nc -P ${OUTPUT_DIR_DATA} https://s3-us-west-2.amazonaws.com/twairball.wmt17.zh-en/cwmt.tgz
+wget -nc -P ${OUTPUT_DIR_DATA} https://s3-us-west-2.amazonaws.com/twairball.wmt17.zh-en/cwmt.tgz || gsutil cp gs://darkt_data/cwmt.tgz ${OUTPUT_DIR_DATA} || echo "download fail, try to find localfile."
 
 echo "unzipping cwmt file"
 tar -zxvf "${OUTPUT_DIR_DATA}/cwmt.tgz" -C "${OUTPUT_DIR_DATA}"
