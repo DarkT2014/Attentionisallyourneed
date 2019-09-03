@@ -3,7 +3,7 @@
 DATA_DIR="/tmp/t2t_datagen/"
 PARAM_SET="base"
 MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
-PARAM_BATCH="batch_size=1024"
+PARAM_BATCH="batch_size=64"
 
 # SOURCE_DIR=./test_data/source_data
 INPUT_VOCAB="$DATA_DIR/vocab.translate_enzh_wmt32k.32768.subwords.en"
