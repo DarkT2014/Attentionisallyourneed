@@ -10,6 +10,7 @@ MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
 echo "Pythonpath is :"
 echo $PYTHONPATH
 export PYTHONPATH="$PYTHONPATH:$PWD/models"
+PARAM_BATCH="batch_size=64"
 
 echo $PYTHONPATH
 pip install --user -r models/official/requirements.txt
@@ -22,7 +23,7 @@ VOCAB_FILE="/tmp/t2t_datagen/enzh.vocab"
 echo "\n The vocab file path is \n"
 echo $VOCAB_FILE
 
-python models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --vocab_file=$VOCAB_FILE
+python models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --vocab_file=$VOCAB_FILE --param_set=$PARAM_BATCH
     
 
     # --param_set=$PARAM_SET
