@@ -23,7 +23,7 @@ VOCAB_FILE="/tmp/t2t_datagen/enzh.vocab"
 echo "\n The vocab file path is \n"
 echo $VOCAB_FILE
 
-python models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --vocab_file=$VOCAB_FILE --param_set=$PARAM_BATCH
+python models/official/transformer/transformer_main.py --data_dir=$DATA_DIR --model_dir=$MODEL_DIR  --vocab_file=$VOCAB_FILE --param_set=base
     
 
     # --param_set=$PARAM_SET
