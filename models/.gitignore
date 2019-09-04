@@ -94,4 +94,6 @@ ENV/
 # For mac
 .DS_Store
 
+
+.vscode
 samples/outreach/blogs/segmentation_blogpost/carvana-image-masking-challenge/
