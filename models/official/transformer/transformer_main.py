@@ -240,17 +240,6 @@ def evaluate_and_log_bleu(estimator, bleu_source, bleu_ref, vocab_file):
 def _validate_file(filepath):
   """Make sure that file exists."""
   if not tf.gfile.Exists(filepath):
-    tf.logging.info("-----------------------------")
-    tf.logging.info(filepath)#byme
-    tf.logging.info("/tmp/t2t_datagen/enzh.vocab")
-    exist = os.path.exists(filepath)
-    
-    tf.logging.info(exist)
-    tf.logging.info(filepath.strip() == "/tmp/t2t_datagen/enzh.vocab")
-    tf.logging.info(type(filepath))
-    # tf.logging.info(os.path.exists("/tmp/t2t_datagen"))
-    # tf.logging.info(os.path.exists("/tmp/t2t_datagen/enzh.vocab"))
-    tf.logging.info("-----------------------------")
     raise tf.errors.NotFoundError(None, None, "File %s not found." % filepath)
 
 
@@ -295,8 +284,6 @@ def run_loop(
       single_iteration_train_epochs were defined.
     NotFoundError: if the vocab file or bleu files don't exist.
   """
-  vocab_file = vocab_file.strip()#byme
-
   if bleu_source:
     _validate_file(bleu_source)
   if bleu_ref:
@@ -339,10 +326,6 @@ def run_loop(
 
     # Train the model for single_iteration_train_steps or until the input fn
     # runs out of examples (if single_iteration_train_steps is None).
-    tf.logging.info("-------------------")#byme
-    tf.logging.info(train_hooks)
-    tf.logging.info(type(train_hooks))
-    tf.logging.info("-------------------")
     estimator.train(
         dataset.train_input_fn,
         steps=schedule_manager.single_iteration_train_steps,
@@ -561,10 +544,8 @@ def run_transformer(flags_obj):
     elif flags_obj.param_set == "base":
       params = model_params.BASE_MULTI_GPU_PARAMS
 
-  # params["data_dir"] = flags_obj.data_dir
-  # params["model_dir"] = flags_obj.model_dir
-  params["data_dir"] = flags_obj.data_dir.strip()#byme
-  params["model_dir"] = flags_obj.model_dir.strip()
+  params["data_dir"] = flags_obj.data_dir
+  params["model_dir"] = flags_obj.model_dir
   params["num_parallel_calls"] = flags_obj.num_parallel_calls
 
   params["tpu"] = flags_obj.tpu
@@ -603,8 +584,7 @@ def run_transformer(flags_obj):
   # Create hooks that log information about the training and metric values
   train_hooks = hooks_helper.get_train_hooks(
       flags_obj.hooks,
-      # model_dir=flags_obj.model_dir,
-      model_dir=flags_obj.model_dir.strip(),#byme
+      model_dir=flags_obj.model_dir,
       tensors_to_log=TENSORS_TO_LOG,  # used for logging hooks
       batch_size=schedule_manager.batch_size,  # for ExamplesPerSecondHook
       use_tpu=params["use_tpu"]  # Not all hooks can run with TPUs
