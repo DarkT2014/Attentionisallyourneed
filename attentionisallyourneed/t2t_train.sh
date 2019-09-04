@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 PROBLEM=translate_enzh_wmt32k
 MODEL=transformer
 HPARAMS=transformer_base_single_gpu
