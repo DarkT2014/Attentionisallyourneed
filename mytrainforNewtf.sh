@@ -10,7 +10,7 @@ MODEL_DIR="model_dir/model_subword_4096_$PARAM_SET"
 echo "Pythonpath is :"
 echo $PYTHONPATH
 export PYTHONPATH="$PYTHONPATH:$PWD/models"
-PARAM_BATCH="batch_size=64"
+PARAM_BATCH="batch_size=16"
 
 echo $PYTHONPATH
 pip install --user -r models/official/requirements.txt
