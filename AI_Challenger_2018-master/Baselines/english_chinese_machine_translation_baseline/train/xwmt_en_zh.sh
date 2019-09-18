@@ -132,8 +132,8 @@ python prepare_data/jieba_cws.py $OUTPUT_DIR/train.zh > $OUTPUT_DIR/wmt_enzh_327
 python prepare_data/jieba_cws.py $OUTPUT_DIR/newstest2018.zh > $OUTPUT_DIR/wmt_enzh_32768k_tok_dev.lang2
 #dev lang2 ?   why not lang1 ??
 
-cat $TMP_DIR/ai_challenger_MTEnglishtoChinese_trainingset_20180821/train.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $DATA_DIR/wmt_enzh_32768k_tok_train.lang2
-cat $DATA_DIR/valid.en-zh.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $DATA_DIR/wmt_enzh_32768k_tok_dev.lang1
+cat $OUTPUT_DIR/train.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $OUTPUT_DIR/wmt_enzh_32768k_tok_train.lang2
+cat $OUTPUT_DIR/newstest2017.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $OUTPUT_DIR/wmt_enzh_32768k_tok_dev.lang1
 
 
 

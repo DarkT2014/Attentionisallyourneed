@@ -1,13 +1,14 @@
-python $bin/t2t-trainer --registry_help
+# python $bin/t2t-trainer --registry_help
 
 #export CUDA_VISIBLE_DEVICES=""
 PROBLEM=translate_enzh_wmt32k
 MODEL=transformer
 HPARAMS=transformer_base_single_gpu
 HOME=`pwd`
-DATA_DIR=$HOME/t2t_data
+DATA_DIR=/tmp/t2t_datagen
+
 TMP_DIR=$DATA_DIR
-TRAIN_DIR=$HOME/t2t_train/$PROBLEM/$MODEL-$HPARAMS
+TRAIN_DIR=/tmp/t2t_outputs/$PROBLEM/$MODEL-$HPARAMS
 
 mkdir -p $DATA_DIR $TMP_DIR $TRAIN_DIR
 
