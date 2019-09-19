@@ -50,8 +50,8 @@ _EVAL_SHARDS = 1
 
 _TARGET_VOCAB_SIZE = 32768  # Number of subtokens in the vocabulary list.
 _TARGET_THRESHOLD = 327  # Accept vocabulary if size is within this threshold
-EN_VOCAB_FILE = "vocab.enzh_wmt32k.%d.subwords.en" % _TARGET_VOCAB_SIZE
-ZH_VOCAB_FILE = "vocab.enzh_wmt32k.%d.subwords.zh" % _TARGET_VOCAB_SIZE
+EN_VOCAB_FILE = "vocab.translate_enzh_wmt32k.%d.subwords.en" % _TARGET_VOCAB_SIZE
+ZH_VOCAB_FILE = "vocab.translate_enzh_wmt32k.%d.subwords.zh" % _TARGET_VOCAB_SIZE
 VOCAB_FILE = "vocab.enzh.only4transforer"
 
 RAW_DIR = "/tmp/t2t_datagen/"
