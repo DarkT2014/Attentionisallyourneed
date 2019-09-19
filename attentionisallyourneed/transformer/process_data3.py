@@ -468,11 +468,11 @@ if __name__ == '__main__':
 
 
 
-        
-        print("type of entoken_counts is ")
-        # print(en_token_counts)
+        print("-----------------------------")
+        print("len of entoken_counts is ")
+        print(len(en_token_counts))
         print("type of zhtokencounts is " )
-        print(type(en_token_counts))
+        print(len(zh_token_counts))
         token_counts = en_token_counts.copy()
 
         token_counts.update(zh_token_counts)  
@@ -513,6 +513,8 @@ if __name__ == '__main__':
                 continue
             subtoken_list.append(zh)
         
+        print("the len of subtoken list is ")
+        print(len(subtoken_list))
         
         _save_vocab_file(vocab_file, subtoken_list)
     subtokenizer = tokenizer.Subtokenizer(vocab_file)
