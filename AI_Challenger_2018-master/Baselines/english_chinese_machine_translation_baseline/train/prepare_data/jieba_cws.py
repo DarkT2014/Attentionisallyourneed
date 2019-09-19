@@ -5,7 +5,9 @@ import sys
 import jieba
 
 def jieba_cws(string):
+    # seg_list = jieba.cut(string.strip().decode('utf8'))
     seg_list = jieba.cut(string.strip())
+    # return u' '.join(seg_list).encode('utf8')
     return u' '.join(seg_list)
 
 
