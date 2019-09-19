@@ -387,7 +387,7 @@ def _count_tokens(files, file_byte_limit=1e6):
             token_counts[token] += 1
   return token_counts
 
-  def _zh_count_tokens(files, file_byte_limit=1e6):
+def _zh_count_tokens(files, file_byte_limit=1e6):
   """Return token counts of words in the files.
 
   Samples file_byte_limit bytes from each file, and counts the words that appear
