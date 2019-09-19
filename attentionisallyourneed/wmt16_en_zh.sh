@@ -28,6 +28,7 @@ OUTPUT_DIR="/tmp/t2t_datagen"
 OUTPUT_DIR_DATA="${OUTPUT_DIR}/data"
 
 mkdir -p $OUTPUT_DIR_DATA
+export PYTHONPATH="$PYTHONPATH:$HOME/mydeeplearning/models"
 
 echo "Downloading cwmt file . This may take a while ..."
 wget -nc -P ${OUTPUT_DIR_DATA} https://s3-us-west-2.amazonaws.com/twairball.wmt17.zh-en/cwmt.tgz || gsutil cp gs://darkt_data/cwmt.tgz ${OUTPUT_DIR_DATA} || echo "download fail, try to find localfile."
