@@ -12,7 +12,7 @@ sys.path.append(os.path.join(os.path.expanduser('~'), 'mydeeplearning/attentioni
 import tensorflow as tf
 import jieba
 from utils.tokenizer import _save_vocab_file, _load_vocab_file
-import tokenizer
+import utils.tokenizer
 
 import random
 
