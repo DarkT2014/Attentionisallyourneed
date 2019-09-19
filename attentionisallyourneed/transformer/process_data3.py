@@ -395,7 +395,8 @@ if __name__ == '__main__':
     #init from file en
     reserved_tokens = RESERVED_TOKENS
 
-     
+    vocab_file = os.path.join(data_dir, VOCAB_FILE)
+
     en_token_counts = collections.defaultdict(int)
     zh_token_counts = collections.defaultdict(int) 
     if tf.gfile.Exists(en_source_file) and tf.gfile.Exists(zh_vocab_file):  
@@ -484,7 +485,7 @@ if __name__ == '__main__':
       
       
         min_count = None
-        vocab_file = os.path.join(data_dir, VOCAB_FILE)
+        
 
         en_alphabet = tokenizer._generate_alphabet_dict(en_token_counts)
         en_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
