@@ -480,7 +480,7 @@ if __name__ == '__main__':
         min_count = None
         vocab_file = os.path.join(data_dir, VOCAB_FILE)
 
-        en_alphabet = tokeninzer._generate_alphabet_dict(en_token_counts)
+        en_alphabet = tokenizer._generate_alphabet_dict(en_token_counts)
         en_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
             en_token_counts, en_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
             reserved_tokens)
@@ -490,7 +490,7 @@ if __name__ == '__main__':
         _save_vocab_file(en_vocab_file, en_subtoken_list)
 
 
-        zh_alphabet = tokeninzer._generate_alphabet_dict(zh_token_counts)
+        zh_alphabet = tokenizer._generate_alphabet_dict(zh_token_counts)
         zh_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
             zh_token_counts, zh_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
             reserved_tokens)
