@@ -374,7 +374,7 @@ def main(unused_argv):
 
   # Create subtokenizer based on the training files.
   tf.logging.info("Step 2/4: Creating subtokenizer and building vocabulary")
-  train_files_flat = train_files["inputs"] + train_files["targets"]
+  train_files_flat = train_files["inputs"] + train_files["targets"]#list
   vocab_file = os.path.join(FLAGS.data_dir, VOCAB_FILE)
   subtokenizer = tokenizer.Subtokenizer.init_from_files(
       vocab_file, train_files_flat, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD,
