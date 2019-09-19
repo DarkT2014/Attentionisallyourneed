@@ -400,25 +400,17 @@ if __name__ == '__main__':
     en_token_counts = collections.defaultdict(int)
     zh_token_counts = collections.defaultdict(int) 
     if tf.gfile.Exists(en_source_file) and tf.gfile.Exists(zh_vocab_file):  
-        tf.logging.info("Vocab file already exists (zh:%s, en:%s)" % (zh_vocab_file, en_vocab_file))
+        print("Vocab file already exists (zh:%s, en:%s)" % (zh_vocab_file, en_vocab_file))
     else:
-        if not tf.gfile.Exists(en_source_file):
-            if tf.gfile.Exists(en_vocab_file):
-                print("Vocab file en already exists (%s)" % en_vocab_file)
-            else:
-                print("Begin steps to create en subtoken vocabulary...")
-
-                en_token_counts = tokenizer._count_tokens(train_files['inputs'], 1e6)
-
-
-            #init from file zh
-            if tf.gfile.Exists(zh_vocab_file):
-                print("Vocab file zh already exists (%s)" % zh_vocab_file)
-            else:
-                print("Begin steps to create zh subtoken vocabulary...")
-
-                zh_token_counts = tokenizer._zh_count_tokens(train_files['targets'], 1e6) 
         
+        print("generate en and zh token counts .. ")
+        en_token_counts = tokenizer._count_tokens(train_files['inputs'], 1e6)
+
+
+        
+
+        zh_token_counts = tokenizer._zh_count_tokens(train_files['targets'], 1e6) 
+    
         # -----------------------------------------
         # token_counts = collections.defaultdict(int)
 
@@ -476,7 +468,7 @@ if __name__ == '__main__':
 
         
         print("type of entoken_counts is ")
-        print(type(en_token_counts))
+        print(en_token_counts)
         print("type of zhtokencounts is " )
         print(type(en_token_counts))
         token_counts = en_token_counts.copy()
