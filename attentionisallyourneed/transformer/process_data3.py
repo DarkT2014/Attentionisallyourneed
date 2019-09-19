@@ -7,6 +7,7 @@ import time
 
 _package_path = "/".join(os.path.abspath(os.path.dirname(__file__)).split("/")[:-1])
 sys.path.append(_package_path)
+sys.path.append(os.path.join(os.path.expanduser('~'), 'mydeeplearning/attentionisallyourneed/transformer'))
 
 import tensorflow as tf
 import jieba
