@@ -11,7 +11,7 @@ sys.path.append(_package_path)
 import tensorflow as tf
 import jieba
 from utils.tokenizer import _save_vocab_file, _load_vocab_file
-import utils.tokeninzer
+import tokenizer
 
 import random
 
@@ -53,6 +53,9 @@ VOCAB_FILE = "vocab.enzh.only4transforer"
 
 RAW_DIR = "/tmp/t2t_datagen/"
 DATA_DIR = "/tmp/t2t_datagen/"
+
+# os.getcwd()
+# sys.path.append('$PWD/transformer')
 
 def iterator_file(file_path):
     with io.open(file_path, encoding='utf-8') as inf:
