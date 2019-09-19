@@ -147,6 +147,17 @@ class Subtokenizer(object):
       ret.append(EOS_ID)
     return ret
 
+
+  def zh_encode(self, raw_string, add_eos=False):
+    """Encodes a string into a list of int subtoken ids."""
+    ret = []
+    tokens = jieba.lcut(_native_to_unicode(raw_string))
+    for token in tokens:
+      ret.extend(self._token_to_subtoken_ids(token))
+    if add_eos:
+      ret.append(EOS_ID)
+    return ret
+
   def _token_to_subtoken_ids(self, token):
     """Encode a single token into a list of subtoken ids."""
     cache_location = hash(token) % self._cache_size
@@ -373,6 +384,42 @@ def _count_tokens(files, file_byte_limit=1e6):
 
           # Add words to token counts
           for token in _split_string_to_tokens(_native_to_unicode(line)):
+            token_counts[token] += 1
+  return token_counts
+
+  def _zh_count_tokens(files, file_byte_limit=1e6):
+  """Return token counts of words in the files.
+
+  Samples file_byte_limit bytes from each file, and counts the words that appear
+  in the samples. The samples are semi-evenly distributed across the file.
+
+  Args:
+    files: List of filepaths
+    file_byte_limit: Max number of bytes that will be read from each file.
+
+  Returns:
+    Dictionary mapping tokens to the number of times they appear in the sampled
+    lines from the files.
+  """
+  token_counts = collections.defaultdict(int)
+
+  for filepath in files:
+    with tf.gfile.Open(filepath, mode="r") as reader:
+      file_byte_budget = file_byte_limit
+      counter = 0
+      lines_to_skip = int(reader.size() / (file_byte_budget * 2))
+      for line in reader:
+        if counter < lines_to_skip:
+          counter += 1
+        else:
+          if file_byte_budget < 0:
+            break
+          line = line.strip()
+          file_byte_budget -= len(line)
+          counter = 0
+
+          # Add words to token counts
+          for token in jieba.lcut(_native_to_unicode(line)):
             token_counts[token] += 1
   return token_counts
 
