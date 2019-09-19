@@ -474,8 +474,10 @@ if __name__ == '__main__':
 
 
         
-        print("type of entoken_counts is "+ type(en_token_counts))
-        print("type of zhtokencounts is " + type(en_token_counts))
+        print("type of entoken_counts is ")
+        print(type(en_token_counts))
+        print("type of zhtokencounts is " )
+        print(type(en_token_counts))
         token_counts = en_token_counts.copy()
         token_counts.update(zh_token_counts)  
       
