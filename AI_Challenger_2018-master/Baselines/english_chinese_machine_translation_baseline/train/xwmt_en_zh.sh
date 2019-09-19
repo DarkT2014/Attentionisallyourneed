@@ -127,14 +127,16 @@ cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.zh ${OUTPUT_DIR}
 cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.en ${OUTPUT_DIR}
 
 
-
+echo "Processing Chinese subword, this may take several minutes ..."
 python prepare_data/jieba_cws.py $OUTPUT_DIR/train.zh > $OUTPUT_DIR/wmt_enzh_32768k_tok_train.lang1
 python prepare_data/jieba_cws.py $OUTPUT_DIR/newstest2018.zh > $OUTPUT_DIR/wmt_enzh_32768k_tok_dev.lang2
 #dev lang2 ?   why not lang1 ??
+echo "Subword done."
 
+echo "Tokenizing ..."
 cat $OUTPUT_DIR/train.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $OUTPUT_DIR/wmt_enzh_32768k_tok_train.lang2
 cat $OUTPUT_DIR/newstest2017.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z > $OUTPUT_DIR/wmt_enzh_32768k_tok_dev.lang1
-
+echo "Tokenizing done ."
 
 
 
@@ -245,5 +247,25 @@ cat $OUTPUT_DIR/newstest2017.en | prepare_data/tokenizer.perl -l en | tr A-Z a-z
   #    | cut -f1 -d ' ' > "${OUTPUT_DIR}/vocab.${merge_ops}"
 
 # done
+
+echo "Calling tensor2tensor t2t-datagen ..."
+PROBLEM=translate_enzh_wmt32k
+MODEL=transformer
+HPARAMS=transformer_base_single_gpu
+HOME=`pwd`
+DATA_DIR=/tmp/t2t_datagen
+
+TMP_DIR=$DATA_DIR
+TRAIN_DIR=/tmp/t2t_outputs/$PROBLEM/$MODEL-$HPARAMS
+
+mkdir -p $DATA_DIR $TMP_DIR $TRAIN_DIR
+
+# Generate data
+t2t-datagen \
+  --data_dir=$DATA_DIR \
+  --tmp_dir=$TMP_DIR \
+  --problem=$PROBLEM
+
+
 
 echo "All done."
