@@ -27,6 +27,7 @@ import numpy as np
 import six
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+import jieba
 
 PAD = "<pad>"
 PAD_ID = 0
