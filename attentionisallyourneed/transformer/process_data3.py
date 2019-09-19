@@ -401,62 +401,64 @@ if __name__ == '__main__':
     if tf.gfile.Exists(en_source_file) and tf.gfile.Exists(zh_vocab_file):  
         tf.logging.info("Vocab file already exists (zh:%s, en:%s)" % (zh_vocab_file, en_vocab_file))
     else:
-        # if not tf.gfile.Exists(en_source_file):
-        #     if tf.gfile.Exists(en_vocab_file):
-        #         tf.logging.info("Vocab file en already exists (%s)" % en_vocab_file)
-        #     else:
-        #         tf.logging.info("Begin steps to create en subtoken vocabulary...")
+        if not tf.gfile.Exists(en_source_file):
+            if tf.gfile.Exists(en_vocab_file):
+                print("Vocab file en already exists (%s)" % en_vocab_file)
+            else:
+                print("Begin steps to create en subtoken vocabulary...")
 
-        #         en_token_counts = tokenizer._count_tokens(train_files['inputs'], 1e6)
+                en_token_counts = tokenizer._count_tokens(train_files['inputs'], 1e6)
 
 
-        #     #init from file zh
-        #     if tf.gfile.Exists(zh_vocab_file):
-        #         tf.logging.info("Vocab file zh already exists (%s)" % zh_vocab_file)
-        #     else:
-        #         tf.logging.info("Begin steps to create zh subtoken vocabulary...")
+            #init from file zh
+            if tf.gfile.Exists(zh_vocab_file):
+                print("Vocab file zh already exists (%s)" % zh_vocab_file)
+            else:
+                print("Begin steps to create zh subtoken vocabulary...")
 
-        #         zh_token_counts = tokenizer._zh_count_tokens(train_files['targets'], 1e6) 
-        token_counts = collections.defaultdict(int)
+                zh_token_counts = tokenizer._zh_count_tokens(train_files['targets'], 1e6) 
+        
+        # -----------------------------------------
+        # token_counts = collections.defaultdict(int)
 
         
-        for filepath in train_files['inputs']:
-            with tf.gfile.Open(filepath, mode="r") as reader:
-                file_byte_budget = 1e6
-                counter = 0
-                lines_to_skip = int(reader.size() / (file_byte_budget * 2))
-                for line in reader:
-                    if counter < lines_to_skip:
-                        counter += 1
-                    else:
-                        if file_byte_budget < 0:
-                            break
-                        line = line.strip()
-                        file_byte_budget -= len(line)
-                        counter = 0 
+        # for filepath in train_files['inputs']:
+        #     with tf.gfile.Open(filepath, mode="r") as reader:
+        #         file_byte_budget = 1e6
+        #         counter = 0
+        #         lines_to_skip = int(reader.size() / (file_byte_budget * 2))
+        #         for line in reader:
+        #             if counter < lines_to_skip:
+        #                 counter += 1
+        #             else:
+        #                 if file_byte_budget < 0:
+        #                     break
+        #                 line = line.strip()
+        #                 file_byte_budget -= len(line)
+        #                 counter = 0 
 
-                # Add words to token counts
-                    for token in tokenizer._split_string_to_tokens(tokenizer._native_to_unicode(line)):
-                        token_counts[token] += 1
+        #         # Add words to token counts
+        #             for token in tokenizer._split_string_to_tokens(tokenizer._native_to_unicode(line)):
+        #                 token_counts[token] += 1
 
-        for filepath in train_files['targets']:
-            with tf.gfile.Open(filepath, mode="r") as reader:
-                file_byte_budget = 1e6
-                counter = 0
-                lines_to_skip = int(reader.size() / (file_byte_budget * 2))
-                for line in reader:
-                    if counter < lines_to_skip:
-                        counter += 1
-                    else:
-                        if file_byte_budget < 0:
-                            break
-                        line = line.strip()
-                        file_byte_budget -= len(line)
-                        counter = 0 
+        # for filepath in train_files['targets']:
+        #     with tf.gfile.Open(filepath, mode="r") as reader:
+        #         file_byte_budget = 1e6
+        #         counter = 0
+        #         lines_to_skip = int(reader.size() / (file_byte_budget * 2))
+        #         for line in reader:
+        #             if counter < lines_to_skip:
+        #                 counter += 1
+        #             else:
+        #                 if file_byte_budget < 0:
+        #                     break
+        #                 line = line.strip()
+        #                 file_byte_budget -= len(line)
+        #                 counter = 0 
 
-                # Add words to token counts
-                    for token in jieba.lcut(tokenizer._native_to_unicode(line)):
-                        token_counts[token] += 1
+        #         # Add words to token counts
+        #             for token in jieba.lcut(tokenizer._native_to_unicode(line)):
+        #                 token_counts[token] += 1
         
         
 
@@ -471,10 +473,11 @@ if __name__ == '__main__':
 
 
 
-
-
-        # token_counts = en_token_counts.copy()
-        # token_counts.update(zh_token_counts)  
+        
+        print("type of entoken_counts is "+ type(en_token_counts))
+        print("type of zhtokencounts is " + type(en_token_counts))
+        token_counts = en_token_counts.copy()
+        token_counts.update(zh_token_counts)  
       
       
         min_count = None
@@ -514,7 +517,7 @@ if __name__ == '__main__':
         
         
         _save_vocab_file(vocab_file, subtoken_list)
-    subtokenizer = tokeninzer.Subtokenizer(vocab_file)
+    subtokenizer = tokenizer.Subtokenizer(vocab_file)
 
 
 
