@@ -479,6 +479,7 @@ if __name__ == '__main__':
         print("type of zhtokencounts is " )
         print(type(en_token_counts))
         token_counts = en_token_counts.copy()
+
         token_counts.update(zh_token_counts)  
       
       
@@ -489,7 +490,7 @@ if __name__ == '__main__':
         en_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
             en_token_counts, en_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
             reserved_tokens)
-        tf.logging.info("Generated vocabulary with %d subtokens." %
+        print("Generated vocabulary with %d subtokens." %
                         len(en_subtoken_list))
         
         _save_vocab_file(en_vocab_file, en_subtoken_list)
@@ -499,7 +500,7 @@ if __name__ == '__main__':
         zh_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
             zh_token_counts, zh_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
             reserved_tokens)
-        tf.logging.info("Generated vocabulary with %d subtokens." %
+        print("Generated vocabulary with %d subtokens." %
                         len(zh_subtoken_list))
         
         _save_vocab_file(zh_vocab_file, zh_subtoken_list)
