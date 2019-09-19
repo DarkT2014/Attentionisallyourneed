@@ -470,7 +470,7 @@ if __name__ == '__main__':
 
         
         print("type of entoken_counts is ")
-        print(en_token_counts)
+        # print(en_token_counts)
         print("type of zhtokencounts is " )
         print(type(en_token_counts))
         token_counts = en_token_counts.copy()
