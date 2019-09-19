@@ -396,8 +396,8 @@ if __name__ == '__main__':
     reserved_tokens = RESERVED_TOKENS
 
      
-    en_token_counts = []
-    zh_token_counts = []  
+    en_token_counts = collections.defaultdict(int)
+    zh_token_counts = collections.defaultdict(int) 
     if tf.gfile.Exists(en_source_file) and tf.gfile.Exists(zh_vocab_file):  
         tf.logging.info("Vocab file already exists (zh:%s, en:%s)" % (zh_vocab_file, en_vocab_file))
     else:
