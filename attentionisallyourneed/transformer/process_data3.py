@@ -5,17 +5,12 @@ import os
 import io
 import time
 
-
-sys.path.append('~/mydeeplearning/attentionisallyourneed/transformer')
-
 _package_path = "/".join(os.path.abspath(os.path.dirname(__file__)).split("/")[:-1])
 sys.path.append(_package_path)
 
 import tensorflow as tf
 import jieba
 from utils.tokenizer import _save_vocab_file, _load_vocab_file
-import utils.tokenizer
-import collections
 import random
 
 
@@ -30,35 +25,16 @@ _TRAIN_DATA = {
 _DEV_DATA = {
     # 'inputs': 'dev.en',
     # 'targets': 'dev.zh'
-    'inputs': 'newstest2018.en',
-    'targets': 'newstest2018.zh'
+    'inputs': 'newstest2017.en',
+    'targets': 'newstest2017.zh'
 }
-
-
-PAD = "<pad>"
-PAD_ID = 0
-EOS = "<EOS>"
-EOS_ID = 1
-RESERVED_TOKENS = [PAD, EOS]
-
-
-
 _TRAIN_TAG = "train"
 _EVAL_TAG = "dev"
 _TRAIN_SHARDS = 100
 _EVAL_SHARDS = 1
 
-_TARGET_VOCAB_SIZE = 32768  # Number of subtokens in the vocabulary list.
-_TARGET_THRESHOLD = 327  # Accept vocabulary if size is within this threshold
-EN_VOCAB_FILE = "vocab.translate_enzh_wmt32k.%d.subwords.en" % _TARGET_VOCAB_SIZE
-ZH_VOCAB_FILE = "vocab.translate_enzh_wmt32k.%d.subwords.zh" % _TARGET_VOCAB_SIZE
-VOCAB_FILE = "vocab.enzh.only4transforer"
-
 RAW_DIR = "/tmp/t2t_datagen/"
 DATA_DIR = "/tmp/t2t_datagen/"
-
-# os.getcwd()
-# sys.path.append('$PWD/transformer')
 
 def iterator_file(file_path):
     with io.open(file_path, encoding='utf-8') as inf:
@@ -160,7 +136,6 @@ def all_exist(filepaths):
 
 
 
-
 def txt_line_iterator(path):
     """Iterate through lines of file."""
     with tf.gfile.Open(path) as f:
@@ -255,7 +230,7 @@ if __name__ == '__main__':
     ##### create vocab
     zh_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.zh")
     en_vocab = os.path.join(source_dir, "vocab.translate_enzh_wmt32k.32768.subwords.en")
-    # print("create vocab ...")
+    print("create vocab ...")
 
 
 
@@ -263,93 +238,92 @@ if __name__ == '__main__':
     zh_source_file = os.path.join(source_dir, _TRAIN_DATA['targets'])
 
 
-    # inputs_tokenizer = tokenizer.Subtokenizer.init_from_files(
-    #     en_vocab, [en_source_file],  2**15, 20,
-    #     min_count=None, file_byte_limit=1e8)
-    # print("en tokenize done.")
+    inputs_tokenizer = tokenizer.Subtokenizer.init_from_files(
+        en_vocab, [en_source_file],  2**15, 20,
+        min_count=None, file_byte_limit=1e8)
+    print("en tokenize done.")
     
 
 
 
 
-    # zh_subtoken_list = []
-    # doIt = True
-    # if os.path.exists(zh_vocab):
-    #     res = raw_input("Detected zh vocab file, skip it?(Y/N)")
-    #     if res.lower() == 'n':
-    #         doIt = True
-    #     elif res.lower() == 'y':
-    #         doIt = False
-    #     elif res == '':
-    #         doIt = False
-    # else:
-    #     doIt = True          
+    zh_subtoken_list = []
+    doIt = True
+    if os.path.exists(zh_vocab):
+        res = raw_input("Detected zh vocab file, skip it?(Y/N)")
+        if res.lower() == 'n':
+            doIt = True
+        elif res.lower() == 'y':
+            doIt = False
+        elif res == '':
+            doIt = False
+    else:
+        doIt = True          
 
 
-    # if doIt:
-    #     # zh_subtoken_list = ['<PAD>', '<GO>', '<EOS>']
-    #     totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
-    #     global start_time
-    #     start_time = time.time()
-    #     # jieba.enable_parallel(4)
-    #     dir_path = os.path.dirname(os.path.realpath(__file__))
-    #     dict_path = os.path.join(dir_path, 'mydict.txt')
-    #     print("path of user dict of jieba is : " + dict_path)
-    #     jieba.load_userdict(dict_path)
-    #     last_time = time.time()
-    #     for i, line in iterator_file(zh_source_file):
-    #         line = line.replace("\r","").replace("\n","")
-    #         if(time.time() - last_time > 0.1):#print per 0.1sec
-    #             last_time = time.time()
-    #             percent = (i+1)/int(totalLineNum) * 100
-    #             duration = time.time() - start_time
-    #             sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
-    #             # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
-    #             sys.stdout.flush()
-    #         zh_subtoken_list.extend(jieba.lcut(line))
-    #     print("\n Cut list done.")
-    # else:
-    #     print("reading existed zh vocab file ...")
-    #     with io.open(zh_vocab, encoding='utf8') as f:
-    #         for line in f:
-    #             zh_subtoken_list.append(line.replace("'","").strip('\n'))
-    #     print("done.")
+    if doIt:
+        # zh_subtoken_list = ['<PAD>', '<GO>', '<EOS>']
+        totalLineNum = os.popen('wc -l ' + zh_source_file).read().split()[0]
+        global start_time
+        start_time = time.time()
+        # jieba.enable_parallel(4)
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        dict_path = os.path.join(dir_path, 'mydict.txt')
+        print("path of user dict of jieba is : " + dict_path)
+        jieba.load_userdict(dict_path)
+        last_time = time.time()
+        for i, line in iterator_file(zh_source_file):
+            line = line.replace("\r","").replace("\n","")
+            if(time.time() - last_time > 0.1):#print per 0.1sec
+                last_time = time.time()
+                percent = (i+1)/int(totalLineNum) * 100
+                duration = time.time() - start_time
+                sys.stdout.write("\r%.2f%% cutting %dth line of %d, %d sec passed. "% (percent, i+1, int(totalLineNum), duration))
+                # print("\rcutting " + str(i) + "th line of :" + line, end='', flush=True)
+                sys.stdout.flush()
+            zh_subtoken_list.extend(jieba.lcut(line))
+        print("\n Cut list done.")
+    else:
+        print("reading existed zh vocab file ...")
+        with io.open(zh_vocab, encoding='utf8') as f:
+            for line in f:
+                zh_subtoken_list.append(line.replace("'","").strip('\n'))
+        print("done.")
     
-    # print("--------------------------------")
+    print("--------------------------------")
     
 
-    # subtoken_list = []
-    # # with io.open(en_vocab, encoding='utf8') as f:
-    # #     for line in f:
-    # #         if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
-    # #             subtoken_list.append(line.replace("'","").strip('\n'))
-    # subtoken_list = _load_vocab_file(en_vocab)
+    subtoken_list = []
+    # with io.open(en_vocab, encoding='utf8') as f:
+    #     for line in f:
+    #         if line is not "'<pad>'\n" and line is not "'<EOS>'\n":
+    #             subtoken_list.append(line.replace("'","").strip('\n'))
+    subtoken_list = _load_vocab_file(en_vocab)
 
 
-    # print(subtoken_list[:10])
-    # print(zh_subtoken_list[:10])
-    # subtoken_list = subtoken_list + zh_subtoken_list
+    print(subtoken_list[:10])
+    print(zh_subtoken_list[:10])
+    subtoken_list = subtoken_list + zh_subtoken_list
     
-    # vocab_file = os.path.join(DATA_DIR, "enzh.vocab")
-    # print("Tokenizinig zh vocab ...")
-    # # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
-    # #     zh_vocab, [zh_source_file],  2**15, 20,
-    # #     min_count=None, file_byte_limit=1e9)
-    # print("Saving zh vocab files ...")
-    # _save_vocab_file(zh_vocab, zh_subtoken_list)
+    vocab_file = os.path.join(DATA_DIR, "enzh.vocab")
+    print("Tokenizinig zh vocab ...")
+    # targets_tokenizer = tokenizer.Subtokenizer.init_from_files(
+    #     zh_vocab, [zh_source_file],  2**15, 20,
+    #     min_count=None, file_byte_limit=1e9)
+    print("Saving zh vocab files ...")
+    _save_vocab_file(zh_vocab, zh_subtoken_list)
 
-    # print("Saving vocab file ...")
+    print("Saving vocab file ...")
     
-    # _save_vocab_file(vocab_file, subtoken_list)
+    _save_vocab_file(vocab_file, subtoken_list)
 
 
 
-    # print("Tokenizing zh vocab done.")
+    print("Tokenizing zh vocab done.")
 
 
     # data_dir = './train_data'
     data_dir = '/tmp/t2t_datagen/'
-    tmp_dir = data_dir
 
 
     
@@ -370,169 +344,11 @@ if __name__ == '__main__':
         'targets': ['/tmp/t2t_datagen/train.zh']
     }
     eval_files = {
-        'inputs': ['/tmp/t2t_datagen/newstest2018.en'],
-        'targets': ['/tmp/t2t_datagen/newstest2018.zh']
+        'inputs': ['/tmp/t2t_datagen/newstest2017.en'],
+        'targets': ['/tmp/t2t_datagen/newstest2017.zh']
     }
 
-    # subtokenizer = tokenizer.Subtokenizer(vocab_file)
-
-
-    en_vocab_file = os.path.join(DATA_DIR, EN_VOCAB_FILE)
-    zh_vocab_file = os.path.join(DATA_DIR, ZH_VOCAB_FILE)
-    
-    # source_datasets = [train_files['inputs']]
-    # target_datasets = [train_files['targets']]
-
-    # source_vocab = generator_utils.get_or_generate_vocab(
-    #     data_dir,
-    #     tmp_dir,
-    #     self.source
-    # )
-
-
-
-    ############################
-
-
-    #init from file en
-    reserved_tokens = RESERVED_TOKENS
-
-    vocab_file = os.path.join(data_dir, VOCAB_FILE)
-
-    en_token_counts = collections.defaultdict(int)
-    zh_token_counts = collections.defaultdict(int) 
-    if tf.gfile.Exists(en_source_file) and tf.gfile.Exists(zh_vocab_file):  
-        print("Vocab file already exists (zh:%s, en:%s)" % (zh_vocab_file, en_vocab_file))
-    else:
-        
-        print("generate en and zh token counts .. ")
-        en_token_counts = tokenizer._count_tokens(train_files['inputs'], 1e6)
-
-
-        
-
-        zh_token_counts = tokenizer._zh_count_tokens(train_files['targets'], 1e6) 
-    
-        # -----------------------------------------
-        # token_counts = collections.defaultdict(int)
-
-        
-        # for filepath in train_files['inputs']:
-        #     with tf.gfile.Open(filepath, mode="r") as reader:
-        #         file_byte_budget = 1e6
-        #         counter = 0
-        #         lines_to_skip = int(reader.size() / (file_byte_budget * 2))
-        #         for line in reader:
-        #             if counter < lines_to_skip:
-        #                 counter += 1
-        #             else:
-        #                 if file_byte_budget < 0:
-        #                     break
-        #                 line = line.strip()
-        #                 file_byte_budget -= len(line)
-        #                 counter = 0 
-
-        #         # Add words to token counts
-        #             for token in tokenizer._split_string_to_tokens(tokenizer._native_to_unicode(line)):
-        #                 token_counts[token] += 1
-
-        # for filepath in train_files['targets']:
-        #     with tf.gfile.Open(filepath, mode="r") as reader:
-        #         file_byte_budget = 1e6
-        #         counter = 0
-        #         lines_to_skip = int(reader.size() / (file_byte_budget * 2))
-        #         for line in reader:
-        #             if counter < lines_to_skip:
-        #                 counter += 1
-        #             else:
-        #                 if file_byte_budget < 0:
-        #                     break
-        #                 line = line.strip()
-        #                 file_byte_budget -= len(line)
-        #                 counter = 0 
-
-        #         # Add words to token counts
-        #             for token in jieba.lcut(tokenizer._native_to_unicode(line)):
-        #                 token_counts[token] += 1
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-        print("-----------------------------")
-        print("len of entoken_counts is ")
-        print(len(en_token_counts))
-        print("type of zhtokencounts is " )
-        print(len(zh_token_counts))
-        token_counts = en_token_counts.copy()
-
-        token_counts.update(zh_token_counts)  
-      
-      
-        min_count = None
-        
-
-        en_alphabet = tokenizer._generate_alphabet_dict(en_token_counts)
-        en_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
-            en_token_counts, en_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
-            reserved_tokens)
-        print("Generated vocabulary with %d subtokens." %
-                        len(en_subtoken_list))
-        
-        _save_vocab_file(en_vocab_file, en_subtoken_list)
-
-
-        zh_alphabet = tokenizer._generate_alphabet_dict(zh_token_counts)
-        zh_subtoken_list = tokenizer._generate_subtokens_with_target_vocab_size(
-            zh_token_counts, zh_alphabet, _TARGET_VOCAB_SIZE, _TARGET_THRESHOLD, min_count,
-            reserved_tokens)
-        print("Generated vocabulary with %d subtokens." %
-                        len(zh_subtoken_list))
-        
-        _save_vocab_file(zh_vocab_file, zh_subtoken_list)
-
-        
-        
-        subtoken_list = []
-        for en in en_subtoken_list:
-            if en in reserved_tokens:
-                continue
-            subtoken_list.append(en)
-        
-        for zh in zh_subtoken_list:
-            if zh in reserved_tokens:
-                continue
-            subtoken_list.append(zh)
-        
-        print("the len of subtoken list is ")
-        print(len(subtoken_list))
-        
-        _save_vocab_file(vocab_file, subtoken_list)
     subtokenizer = tokenizer.Subtokenizer(vocab_file)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     print("Step 3/4: Compiling training and evaluation data")
     compiled_train_files = compile_files(RAW_DIR, train_files, _TRAIN_TAG)

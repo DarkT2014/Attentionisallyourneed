@@ -176,18 +176,22 @@ cp ${OUTPUT_DIR_DATA}/test/test/newstest20*.en ${OUTPUT_DIR}
 #   > ${OUTPUT_DIR}/vocab.50k.zh \
 
 echo "Please Select:
-1.run process_data2.py
-2.run process_data3.py"
-read -p "Enter selection [1 or 2] >" num
-if [[ $num =~ ^[0-2]$ ]]; then
+2.run process_data2.py -- preprocess data for own code train
+3.run process_data3.py -- preprocess data for t2t-trainer v1
+4.run process_data4.py -- preprocess data for t2t-trainer v2"
+read -p "Enter selection [2 or 3 or 4] >" num
+if [[ $num =~ ^[0-4]$ ]]; then
 
-  if [[ $num == 1 ]]; then
+  if [[ $num == 2 ]]; then
     python transformer/process_data2.py
   fi
-  if [[ $num == 2 ]]; then
+  if [[ $num == 3 ]]; then
     python transformer/process_data3.py
   fi
-  if [[ $num == 0 ]]; then
+  if [[ $num == 4 ]]; then
+    python transformer/process_data4.py
+  fi
+  if [[ $num == 1 ]]; then
     echo "do nothing, exit."
     exit;
   fi
